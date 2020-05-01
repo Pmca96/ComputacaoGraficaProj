@@ -20,7 +20,7 @@ var loadWorld = function(){
 
         scene = new THREE.Scene();
 
-        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 1000);
+        camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
         camera.position.z = 5;
         //camera.lookAt( new THREE.Vector3(0,0,0));
 
@@ -31,32 +31,20 @@ var loadWorld = function(){
 
         //Add Floor To the Scene HERE-------------------
 
-        var loader = new THREE.TextureLoader();
-        var groundTexture = loader.load( '/home/www/ComputacaoGraficaProj/images/grass.png' );
-        groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
-        groundTexture.repeat.set( 25, 25 );
-        groundTexture.anisotropy = 16;
-        groundTexture.encoding = THREE.sRGBEncoding;
-
-        var groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
-
-        var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
-        mesh.position.y = - 250;
-        mesh.rotation.x = - Math.PI / 2;
-        mesh.receiveShadow = true;
-        scene.add( mesh );
 
 
-        var floorTexture = new THREE.TextureLoader().load("/home/www/ComputacaoGraficaProj/images/grass.png");
+        var floorTexture = new THREE.TextureLoader().load("images/grass.png");
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
         floorTexture.repeat.set( 10, 10 );
-        var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture } );
-        var floorGeometry = new THREE.PlaneGeometry(10000, 10000, 100, 100);
+        var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+        //var floorMaterial = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide } );
+        var floorGeometry = new THREE.PlaneGeometry(200,200, 10, 10);
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
-        floor.position.y = -250;
+        floor.position.y = -0.5;
         floor.rotation.x = - Math.PI / 2;
         scene.add(floor);
         objects.push(floor);
+
         //Events------------------------------------------
         document.addEventListener('click', onMouseClick, false );
         document.addEventListener('mousedown', onMouseDown, false);
@@ -181,11 +169,9 @@ var createPlayer = function(data){
 };
 
 var updateCameraPosition = function(){
-
-    camera.position.x = player.position.x + 6 * Math.sin( player.rotation.y );
-    camera.position.y = player.position.y + 6;
-    camera.position.z = player.position.z + 6 * Math.cos( player.rotation.y );
-
+    camera.position.x = player.position.x + 4* Math.cos( player.rotation.x );
+    camera.position.y = player.position.y + 4 ;
+    camera.position.z = player.position.z + 10 * Math.cos( player.rotation.z );
 };
 
 var updatePlayerPosition = function(data){
