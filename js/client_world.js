@@ -28,16 +28,35 @@ var loadWorld = function(){
         renderer.setSize( window.innerWidth, window.innerHeight);
 
         raycaster = new THREE.Raycaster();
-        //Add Objects To the Scene HERE-------------------
 
-        //Sphere------------------
-        var sphere_geometry = new THREE.SphereGeometry(1);
-        var sphere_material = new THREE.MeshNormalMaterial();
-        sphere = new THREE.Mesh( sphere_geometry, sphere_material );
+        //Add Floor To the Scene HERE-------------------
 
-        scene.add( sphere );
-        objects.push( sphere ); //if you are interested in detecting an intersection with this sphere
+        var loader = new THREE.TextureLoader();
+        var groundTexture = loader.load( '/home/www/ComputacaoGraficaProj/images/grass.png' );
+        groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
+        groundTexture.repeat.set( 25, 25 );
+        groundTexture.anisotropy = 16;
+        groundTexture.encoding = THREE.sRGBEncoding;
 
+        var groundMaterial = new THREE.MeshLambertMaterial( { map: groundTexture } );
+
+        var mesh = new THREE.Mesh( new THREE.PlaneBufferGeometry( 20000, 20000 ), groundMaterial );
+        mesh.position.y = - 250;
+        mesh.rotation.x = - Math.PI / 2;
+        mesh.receiveShadow = true;
+        scene.add( mesh );
+
+
+        var floorTexture = new THREE.TextureLoader().load("/home/www/ComputacaoGraficaProj/images/grass.png");
+        floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+        floorTexture.repeat.set( 10, 10 );
+        var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture } );
+        var floorGeometry = new THREE.PlaneGeometry(10000, 10000, 100, 100);
+        var floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.position.y = -250;
+        floor.rotation.x = - Math.PI / 2;
+        scene.add(floor);
+        objects.push(floor);
         //Events------------------------------------------
         document.addEventListener('click', onMouseClick, false );
         document.addEventListener('mousedown', onMouseDown, false);
