@@ -73,7 +73,7 @@ var loadWorld = function(){
 
             checkKeyStates();
 
-            camera.lookAt( player.position );
+            //camera.lookAt( player.position );
         }
         //Render Scene---------------------------------------
         renderer.clear();
@@ -150,6 +150,15 @@ var createPlayer = function(data){
     // var cube_geometry = new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ);
     // var cube_material = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: false});
     // player = new THREE.Mesh(cube_geometry, cube_material);
+    // var textureLoader = new THREE.TextureLoader();
+    // var texture1 = textureLoader.load( 'male_adventurer/Adventurer_baseColor.png' );
+    // texture1.flipY = false;
+    // var texture11 = new THREE.MeshPhongMaterial({map: texture1});
+    hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
+    hemiLight.color.setHSL( 0.6, 1, 0.6 );
+    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+    hemiLight.position.set( 0, 50, 0 );
+    scene.add( hemiLight );
 
     var loader = new THREE.GLTFLoader();
     var dracoLoader = new THREE.DRACOLoader();
@@ -159,14 +168,20 @@ var createPlayer = function(data){
 
         player = gltf.scene;
         console.log(gltf);
-        player.rotation.set(0,0,0);
-	
+        player.rotation.set(0,5,0);
+      
+        //player.material.map = texture1;
+        console.log(player);
         player.traverse( function ( child ) {
 		
             if (child instanceof THREE.Mesh) {
-    
-                child.castShadow=true;
-    
+                // var floorTexture = new THREE.TextureLoader().load('male_adventurer/Adventurer_baseColor.png');
+                // floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
+                // child.castShadow=true;
+                // child.material.emissive = new THREE.Color( 0x00ffff );
+                // child.material = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+                // console.log(child.material);
+                
             }
         });
         player.position.x = data.x;
@@ -182,7 +197,7 @@ var createPlayer = function(data){
         objects.push( player );
         scene.add( player );
         
-        camera.lookAt( player.position );
+        //camera.lookAt( player.position );
 
 
         player.traverse( function ( object ) {
@@ -191,16 +206,16 @@ var createPlayer = function(data){
 
         //createPanel();
         var animations = gltf.animations;
-        console.log(animations);
         mixer = new THREE.AnimationMixer( player );
         
-        // idleAction = mixer.clipAction( animations[ 0 ] );
-        // walkAction = mixer.clipAction( animations[ 3 ] );
-        // runAction = mixer.clipAction( animations[ 1 ] );
+        idleAction = mixer.clipAction( animations[ 6 ]  );
+        walkAction = mixer.clipAction( animations[ 3 ] );
+        runAction = mixer.clipAction( animations[ 1 ] );
+        idleAction.setLoop( THREE.LoopOnce );
+        idleAction.play();
+        actions = [ idleAction, walkAction, runAction ];
 
-        // actions = [ idleAction, walkAction, runAction ];
-
-        // activateAllActions();
+        //activateAllActions();
 
         // animate();
 
@@ -210,9 +225,9 @@ var createPlayer = function(data){
 };
 
 var updateCameraPosition = function(){
-    camera.position.x = player.position.x + 4* Math.cos( player.rotation.x );
-    camera.position.y = player.position.y + 4 ;
-    camera.position.z = player.position.z + 10 * Math.cos( player.rotation.z );
+    camera.position.x = player.position.x + 10 * Math.cos( player.rotation.x );
+    camera.position.y = player.position.y - 2 ;
+    camera.position.z = player.position.z - 2 * Math.cos( player.rotation.z );
 };
 
 var updatePlayerPosition = function(data){
@@ -316,3 +331,29 @@ var playerForId = function(id){
     }
     return otherPlayers[index];
 };
+
+
+
+function activateAllActions() {
+
+    setWeight( idleAction, 1 );
+    setWeight( walkAction, 1 );
+    setWeight( runAction, 1 );
+
+    actions.forEach( function ( action ) {
+
+        action.play();
+        console.log(action);
+
+    } );
+
+}
+
+function setWeight( action, weight ) {
+
+    action.enabled = true;
+    action.setEffectiveTimeScale( 1 );
+    action.setEffectiveWeight( weight );
+
+
+}
