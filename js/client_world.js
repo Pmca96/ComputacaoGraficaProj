@@ -9,6 +9,11 @@ var playerData;
 
 var otherPlayers = [], otherPlayersId = [];
 
+let clip = [];
+let clock = new THREE.Clock();
+let mixer;
+let delta;
+
 var loadWorld = function(){
 
     init();
@@ -27,8 +32,20 @@ var loadWorld = function(){
 
         renderer = new THREE.WebGLRenderer( { alpha: true} );
         renderer.setSize( window.innerWidth, window.innerHeight);
-
+        renderer.shadowMap.enabled = true;
         raycaster = new THREE.Raycaster();
+
+        // Add Light
+        light = new THREE.DirectionalLight( 0xffffff );
+        var helper = new THREE.DirectionalLightHelper( light, 2 );
+        light.color.setHSL( 0.1, 1, 0.95 );
+        light.position.multiplyScalar( 30 );
+        light.position.set( 4, 3, 0 );
+        light.shadow.mapSize.width = 1000;
+        light.shadow.mapSize.height = 1000;
+        scene.add( light );
+
+        light.castShadow = true;
 
         //Add Floor To the Scene HERE-------------------
         var floorTexture = new THREE.TextureLoader().load("images/grass.png");
@@ -39,6 +56,7 @@ var loadWorld = function(){
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = -0.5;
         floor.rotation.x = - Math.PI / 2;
+        floor.receiveShadow = true;
         scene.add(floor);
         objects.push(floor);
 
@@ -47,13 +65,9 @@ var loadWorld = function(){
             .setPath( 'images/' )
             .load( [ 'xpos.png', 'xneg.png',  'zpos.png', 'zneg.png','ypos.png', 'yneg.png' ] );
 
-        // Add Light
-        
-            hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
-            hemiLight.color.setHSL( 0.6, 1, 0.6 );
-            hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-            hemiLight.position.set( 0, 50, 0 );
-            scene.add( hemiLight );
+
+
+
         //Events------------------------------------------
         document.addEventListener('click', onMouseClick, false );
         document.addEventListener('mousedown', onMouseDown, false);
@@ -71,6 +85,12 @@ var loadWorld = function(){
 
     function animate(){
         requestAnimationFrame( animate );
+        
+        var delta = clock.getDelta();
+        if ( !(typeof mixer === 'undefined')) {
+            mixer.update( delta );
+            
+        }
         render();
     }
     function render(){
@@ -161,14 +181,16 @@ var createPlayer = function(data){
 
         player = gltf.scene;
         player.rotation.set(0,5,0);
-      
+        player.castShadow = true;
         player.traverse( function ( child ) {
 		
             if (child instanceof THREE.Mesh) {
+                child.castShadow = true;
             }
         });
+        console.log(player);
         player.position.x = data.x;
-        player.position.y = data.y;
+        player.position.y = data.y+5;
         player.position.z = data.z;
         playerId = data.playerId;
         moveSpeed = data.speed;
@@ -184,16 +206,14 @@ var createPlayer = function(data){
         } );
 
         var animations = gltf.animations;
-        mixer = new THREE.AnimationMixer( player );
-        console.log(animations);
-        idleAction = mixer.clipAction( animations[ 6 ]  );
-        walkAction = mixer.clipAction( animations[ 3 ] );
-        runAction = mixer.clipAction( animations[ 1 ] );
-        idleAction.setLoop( THREE.LoopOnce );
-        idleAction.play();
-        actions = [ idleAction, walkAction, runAction ];
-
        
+        mixer = new THREE.AnimationMixer( player );
+        //mixer.clipAction( gltf.animations[ 0 ] ).play();
+        animations.map((v,i) => {
+            clip[i] = mixer.clipAction(v);
+        })
+        clip[6].play();
+        console.log(clip);
 
     } );
     
@@ -201,11 +221,10 @@ var createPlayer = function(data){
 };
 
 var updateCameraPosition = function(){
-    camera.position.x = player.position.x - 2 *  Math.sin( player.rotation.y );
-    camera.position.y = player.position.y + 2 ;
-    camera.position.z = player.position.z - 2 * Math.cos( player.rotation.y );
-    camera.lookAt( new THREE.Vector3(player.position.x,player.position.y+1.5,player.position.z));
-    
+    camera.position.x = player.position.x - 3 *  Math.sin( player.rotation.y );
+    camera.position.y = player.position.y + 1.5 ;
+    camera.position.z = player.position.z - 3 * Math.cos( player.rotation.y );
+    camera.lookAt( new THREE.Vector3(player.position.x,player.position.y+0.8,player.position.z));
 };
 
 var updatePlayerPosition = function(data){
@@ -239,40 +258,52 @@ var checkKeyStates = function(){
         player.position.x += moveSpeed * Math.sin(player.rotation.y);
         player.position.z += moveSpeed * Math.cos(player.rotation.y);
         updatePlayerData();
+        clip[2].play();
         socket.emit('updatePosition', playerData);
-    }
-    if (keyState[40] || keyState[83]) {
+    } else if (keyState[40] || keyState[83]) {
         // down arrow or 's' - move backward
         player.position.x -= moveSpeed * Math.sin(player.rotation.y);
         player.position.z -= moveSpeed * Math.cos(player.rotation.y);
+
+        clip[18].play();
         updatePlayerData();
         socket.emit('updatePosition', playerData);
-    }
-    if (keyState[37] || keyState[65]) {
+    } else if (keyState[37] || keyState[65]) {
         // left arrow or 'a' - rotate left
         player.rotation.y += turnSpeed;
         updatePlayerData();
         socket.emit('updatePosition', playerData);
-    }
-    if (keyState[39] || keyState[68]) {
+    } else if (keyState[39] || keyState[68]) {
         // right arrow or 'd' - rotate right
         player.rotation.y -= turnSpeed;
         updatePlayerData();
         socket.emit('updatePosition', playerData);
-    }
-    if (keyState[81]) {
+    }else if (keyState[81]) {
         // 'q' - strafe left
-        player.position.x -= moveSpeed * Math.cos(player.rotation.y);
-        player.position.z += moveSpeed * Math.sin(player.rotation.y);
+        player.position.x -= moveSpeed/2 * Math.cos(player.rotation.y);
+        player.position.z += moveSpeed/2 * Math.sin(player.rotation.y);
+        mixer.uncacheAction(clip[0]);
+        clip[0].setLoop( THREE.LoopOnce );
+        clip[0].play();
         updatePlayerData();
         socket.emit('updatePosition', playerData);
-    }
-    if (keyState[69]) {
+    } else if (keyState[69]) {
         // 'e' - strage right
-        player.position.x += moveSpeed * Math.cos(player.rotation.y);
-        player.position.z -= moveSpeed * Math.sin(player.rotation.y);
+        player.position.x += moveSpeed/2 * Math.cos(player.rotation.y);
+        player.position.z -= moveSpeed/2 * Math.sin(player.rotation.y);
+        console.log(mixer.getRoot());
+        console.log(clock);
+        console.log(clip[10]);
+       
+        mixer.uncacheAction(clip[10]);
+        clip[10].setLoop( THREE.LoopOnce );
+        clip[10].play();
+        
         updatePlayerData();
+
         socket.emit('updatePosition', playerData);
+    } else {
+        clip[6].play();
     }
 
 };
@@ -321,7 +352,6 @@ function activateAllActions() {
     actions.forEach( function ( action ) {
 
         action.play();
-        console.log(action);
 
     } );
 
