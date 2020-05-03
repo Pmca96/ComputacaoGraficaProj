@@ -5,13 +5,10 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var world = require('./js/server_world');
 
-app.use(express.static('public'));
+app.use(express.static(__dirname));
 
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/index.html');
-});
-app.get('/js/client_world.js', function(req, res){
-    res.sendFile(__dirname + '/js/client_world.js');
 });
 
 // Handle connection
