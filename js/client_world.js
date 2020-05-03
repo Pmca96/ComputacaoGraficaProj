@@ -34,7 +34,7 @@ var loadWorld = function(){
         var floorTexture = new THREE.TextureLoader().load("images/grass.png");
         floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
         floorTexture.repeat.set( 10, 10 );
-        var floorMaterial = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
+        var floorMaterial = new THREE.MeshPhongMaterial( { map: floorTexture, side: THREE.DoubleSide } );
         var floorGeometry = new THREE.PlaneGeometry(200,200, 10, 10);
         var floor = new THREE.Mesh(floorGeometry, floorMaterial);
         floor.position.y = -0.5;
@@ -45,7 +45,15 @@ var loadWorld = function(){
         //Add SkyBox to the Scene HERE -----------------------
         scene.background = new THREE.CubeTextureLoader()
             .setPath( 'images/' )
-            .load( [ 'x1.png', 'x2.png', 'y1.png', 'y2.png', 'z1.png', 'z2.png' ] );
+            .load( [ 'xpos.png', 'xneg.png',  'zpos.png', 'zneg.png','ypos.png', 'yneg.png' ] );
+
+        // Add Light
+        
+            hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
+            hemiLight.color.setHSL( 0.6, 1, 0.6 );
+            hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
+            hemiLight.position.set( 0, 50, 0 );
+            scene.add( hemiLight );
         //Events------------------------------------------
         document.addEventListener('click', onMouseClick, false );
         document.addEventListener('mousedown', onMouseDown, false);
@@ -68,12 +76,8 @@ var loadWorld = function(){
     function render(){
 
         if ( player ){
-
             updateCameraPosition();
-
             checkKeyStates();
-
-            //camera.lookAt( player.position );
         }
         //Render Scene---------------------------------------
         renderer.clear();
@@ -147,18 +151,7 @@ var createPlayer = function(data){
 
     playerData = data;
 
-    // var cube_geometry = new THREE.BoxGeometry(data.sizeX, data.sizeY, data.sizeZ);
-    // var cube_material = new THREE.MeshBasicMaterial({color: 0x7777ff, wireframe: false});
-    // player = new THREE.Mesh(cube_geometry, cube_material);
-    // var textureLoader = new THREE.TextureLoader();
-    // var texture1 = textureLoader.load( 'male_adventurer/Adventurer_baseColor.png' );
-    // texture1.flipY = false;
-    // var texture11 = new THREE.MeshPhongMaterial({map: texture1});
-    hemiLight = new THREE.HemisphereLight( 0xffffff, 0xffffff, 2 );
-    hemiLight.color.setHSL( 0.6, 1, 0.6 );
-    hemiLight.groundColor.setHSL( 0.095, 1, 0.75 );
-    hemiLight.position.set( 0, 50, 0 );
-    scene.add( hemiLight );
+
 
     var loader = new THREE.GLTFLoader();
     var dracoLoader = new THREE.DRACOLoader();
@@ -167,27 +160,16 @@ var createPlayer = function(data){
     loader.load( 'male_adventurer/scene.gltf', function ( gltf ) {
 
         player = gltf.scene;
-        console.log(gltf);
         player.rotation.set(0,5,0);
       
-        //player.material.map = texture1;
-        console.log(player);
         player.traverse( function ( child ) {
 		
             if (child instanceof THREE.Mesh) {
-                // var floorTexture = new THREE.TextureLoader().load('male_adventurer/Adventurer_baseColor.png');
-                // floorTexture.wrapS = floorTexture.wrapT = THREE.RepeatWrapping; 
-                // child.castShadow=true;
-                // child.material.emissive = new THREE.Color( 0x00ffff );
-                // child.material = new THREE.MeshBasicMaterial( { map: floorTexture, side: THREE.DoubleSide } );
-                // console.log(child.material);
-                
             }
         });
         player.position.x = data.x;
         player.position.y = data.y;
         player.position.z = data.z;
-    
         playerId = data.playerId;
         moveSpeed = data.speed;
         turnSpeed = data.turnSpeed;
@@ -197,17 +179,13 @@ var createPlayer = function(data){
         objects.push( player );
         scene.add( player );
         
-        //camera.lookAt( player.position );
-
-
         player.traverse( function ( object ) {
             if ( object.isMesh ) object.castShadow = true;
         } );
 
-        //createPanel();
         var animations = gltf.animations;
         mixer = new THREE.AnimationMixer( player );
-        
+        console.log(animations);
         idleAction = mixer.clipAction( animations[ 6 ]  );
         walkAction = mixer.clipAction( animations[ 3 ] );
         runAction = mixer.clipAction( animations[ 1 ] );
@@ -215,9 +193,7 @@ var createPlayer = function(data){
         idleAction.play();
         actions = [ idleAction, walkAction, runAction ];
 
-        //activateAllActions();
-
-        // animate();
+       
 
     } );
     
@@ -225,9 +201,11 @@ var createPlayer = function(data){
 };
 
 var updateCameraPosition = function(){
-    camera.position.x = player.position.x + 10 * Math.cos( player.rotation.x );
-    camera.position.y = player.position.y - 2 ;
-    camera.position.z = player.position.z - 2 * Math.cos( player.rotation.z );
+    camera.position.x = player.position.x - 2 *  Math.sin( player.rotation.y );
+    camera.position.y = player.position.y + 2 ;
+    camera.position.z = player.position.z - 2 * Math.cos( player.rotation.y );
+    camera.lookAt( new THREE.Vector3(player.position.x,player.position.y+1.5,player.position.z));
+    
 };
 
 var updatePlayerPosition = function(data){
@@ -258,15 +236,15 @@ var updatePlayerData = function(){
 var checkKeyStates = function(){
     if (keyState[38] || keyState[87]) {
         // up arrow or 'w' - move forward
-        player.position.x -= moveSpeed * Math.sin(player.rotation.y);
-        player.position.z -= moveSpeed * Math.cos(player.rotation.y);
+        player.position.x += moveSpeed * Math.sin(player.rotation.y);
+        player.position.z += moveSpeed * Math.cos(player.rotation.y);
         updatePlayerData();
         socket.emit('updatePosition', playerData);
     }
     if (keyState[40] || keyState[83]) {
         // down arrow or 's' - move backward
-        player.position.x += moveSpeed * Math.sin(player.rotation.y);
-        player.position.z += moveSpeed * Math.cos(player.rotation.y);
+        player.position.x -= moveSpeed * Math.sin(player.rotation.y);
+        player.position.z -= moveSpeed * Math.cos(player.rotation.y);
         updatePlayerData();
         socket.emit('updatePosition', playerData);
     }
