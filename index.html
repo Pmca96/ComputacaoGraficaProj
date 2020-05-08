@@ -56,7 +56,6 @@
         app.add(player);
     });
     socket.on('removeOtherPlayer', function(data){
-        console.log(data);
         app.remove(data.playerId);
     });
 

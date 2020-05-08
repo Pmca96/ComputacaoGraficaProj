@@ -37,7 +37,6 @@ class Player extends THREE.Object3D {
     };
     
     updatePlayerPosition(data){
-        console.log(data);
         this.mesh.position.x = data.x;
         this.mesh.position.y = data.y;
         this.mesh.position.z = data.z;
@@ -103,7 +102,6 @@ class Player extends THREE.Object3D {
         data.r_x = this.mesh.rotation.x;
         data.r_y = this.mesh.rotation.y;
         data.r_z = this.mesh.rotation.z;
-        console.log(data);
         socket.emit('updatePosition', data);
     }
     
@@ -151,8 +149,6 @@ function loadMesh(scene, player, fn) {
             player.clip[i] = player.mixer.clipAction(v);
         })
         player.clip[6].play();
-        console.log("animation");
-        console.log(player.clip);
         fn(player);
     } );
 }

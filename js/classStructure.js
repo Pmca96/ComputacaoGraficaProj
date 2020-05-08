@@ -243,7 +243,7 @@ class Application {
     }
 
     remove(id) {
-        this.scene.remove( this.playerForId(id) );
+        this.scene.remove( this.playerForId(id).mesh );
     }
 
     onMouseClick(){
@@ -302,6 +302,7 @@ class Application {
 
     setMainPlayer(player) {
         this.MainPlayer = player;
+        
     }
 
     playerForId (id){
