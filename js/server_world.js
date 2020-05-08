@@ -2,10 +2,9 @@
 var players = [];
 
 function Player(){
-
     this.playerId = players.length;
     this.x = 1;
-    this.y = 0;
+    this.y = 0.7;
     this.z = 1;
     this.r_x = 0;
     this.r_y = 0;
@@ -15,7 +14,6 @@ function Player(){
     this.sizeZ = 1;
     this.speed = 0.1;
     this.turnSpeed = 0.03;
-
 }
 
 var addPlayer = function(id){

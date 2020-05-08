@@ -1,9 +1,9 @@
 
 const express = require('express')
 const app = express()
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
-var world = require('./js/server_world');
+const http = require('http').Server(app);
+const io = require('socket.io')(http);
+const world = require('./js/server_world');
 
 app.use(express.static(__dirname));
 
@@ -25,8 +25,9 @@ io.on('connection', function(socket){
 
     socket.on('requestOldPlayers', function(){
         for (var i = 0; i < world.players.length; i++){
-            if (world.players[i].playerId != id)
+            if (world.players[i].playerId != id) {
                 socket.emit('addOtherPlayer', world.players[i]);
+            }
         }
     });
     socket.on('updatePosition', function(data){

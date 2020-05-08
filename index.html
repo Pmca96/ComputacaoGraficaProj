@@ -8,7 +8,9 @@
     <script src="/js/libs/GLTFLoader.js" ></script>
     <script src="/js/libs/DRACOLoader.js" ></script>
     <script src="/js/libs/OBJLoader.js" ></script>
-    <script src="/js/client_world.js" ></script>
+    <!-- <script src="/js/client_world.js" ></script> -->
+    <script src="/js/classPlayer.js" ></script>
+    <script src="/js/classStructure.js" ></script>
 
     <style>
         body {
@@ -22,23 +24,40 @@
 <div id="container"></div>
 <script>
 
+
+    var app;
     var socket = io();
 
-    socket.on('updatePosition', function(data){
-        updatePlayerPosition(data);
-    });
     socket.on('connect', function(){
-        loadWorld();
+        app = new Application();
+
+        let objs = [
+            new Fence({x : 1, y : 0, z : 1}),
+            new Fence({x : 3, y : 0, z : 3}),
+            new Fence({x : 3, y : 0, z : 5})
+        ];
+        app.add(objs);
         socket.emit('requestOldPlayers', {});
     });
+
+    socket.on('updatePosition', function(data){
+        var player = app.playerForId(data.playerId);
+        player.updatePlayerPosition(data);
+    });
+ 
     socket.on('createPlayer', function(data){
-        createPlayer(data);
+        let mainPlayer = new Player(data);
+        app.add(mainPlayer);
+        app.setMainPlayer(mainPlayer);
+        
     });
     socket.on('addOtherPlayer', function(data){
-        addOtherPlayer(data);
+        let player = new Player(data);
+        app.add(player);
     });
     socket.on('removeOtherPlayer', function(data){
-        removeOtherPlayer(data);
+        console.log(data);
+        app.remove(data.playerId);
     });
 
 </script>

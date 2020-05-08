@@ -15,7 +15,6 @@ let mixer;
 let delta;
 
 var loadWorld = function(){
-
     init();
     animate();
 
@@ -28,7 +27,6 @@ var loadWorld = function(){
 
         camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
         camera.position.z = 5;
-        //camera.lookAt( new THREE.Vector3(0,0,0));
 
         renderer = new THREE.WebGLRenderer( { alpha: true} );
         renderer.setSize( window.innerWidth, window.innerHeight);
@@ -58,7 +56,6 @@ var loadWorld = function(){
         floor.rotation.x = - Math.PI / 2;
         floor.receiveShadow = true;
         scene.add(floor);
-        objects.push(floor);
 
         //Add SkyBox to the Scene HERE -----------------------
         scene.background = new THREE.CubeTextureLoader()
@@ -93,6 +90,7 @@ var loadWorld = function(){
         }
         render();
     }
+
     function render(){
 
         if ( player ){
@@ -127,16 +125,10 @@ var loadWorld = function(){
 
     }
     function onKeyDown( event ){
-
-        //event = event || window.event;
-
         keyState[event.keyCode || event.which] = true;
-
     }
 
     function onKeyUp( event ){
-
-        //event = event || window.event;
 
         keyState[event.keyCode || event.which] = false;
 
@@ -168,10 +160,7 @@ var loadWorld = function(){
 };
 
 var createPlayer = function(data){
-
     playerData = data;
-
-
 
     var loader = new THREE.GLTFLoader();
     var dracoLoader = new THREE.DRACOLoader();
@@ -201,9 +190,7 @@ var createPlayer = function(data){
         objects.push( player );
         scene.add( player );
         
-        player.traverse( function ( object ) {
-            if ( object.isMesh ) object.castShadow = true;
-        } );
+ 
 
         var animations = gltf.animations;
        
@@ -340,28 +327,3 @@ var playerForId = function(id){
     }
     return otherPlayers[index];
 };
-
-
-
-function activateAllActions() {
-
-    setWeight( idleAction, 1 );
-    setWeight( walkAction, 1 );
-    setWeight( runAction, 1 );
-
-    actions.forEach( function ( action ) {
-
-        action.play();
-
-    } );
-
-}
-
-function setWeight( action, weight ) {
-
-    action.enabled = true;
-    action.setEffectiveTimeScale( 1 );
-    action.setEffectiveWeight( weight );
-
-
-}
