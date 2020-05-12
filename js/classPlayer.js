@@ -1,5 +1,4 @@
 class Player extends THREE.Object3D {
-
     constructor( data ){
         super();
         this.playerId = data.playerId;
@@ -16,10 +15,13 @@ class Player extends THREE.Object3D {
         this.turnSpeed = data.turnSpeed;
         this.keyState = {};
         this.clip = [];
+        this.lookingAtZ = 0;
+        this.text = 0;
     }
-    createPlayer(scene,camera){
+
+    createPlayer(scene,camera, light){
         loadMesh(scene, this, function (fn) {
-            fn.updateCameraPosition(camera);
+            fn.updateCameraPosition(camera, light, 1);
         });
     };
 
@@ -27,13 +29,62 @@ class Player extends THREE.Object3D {
         return this.mesh;
     }
      
+    updateCameraPosition(camera, light, event){
 
-    updateCameraPosition(camera){
-        camera.position.x = this.mesh.position.x - 3 *  Math.sin( this.mesh.rotation.y );
+        camera.position.x = this.mesh.position.x - 0 *  Math.sin( this.mesh.rotation.y );
         camera.position.y = this.mesh.position.y + 1.5 ;
-        camera.position.z = this.mesh.position.z - 3 * Math.cos( this.mesh.rotation.y );
-        camera.lookAt( new THREE.Vector3(this.mesh.position.x,this.mesh.position.y+0.8,this.mesh.position.z));
-        return camera;
+        camera.position.z = this.mesh.position.z - 0 * Math.cos( this.mesh.rotation.y );
+        if (event != null  && this.text != 200 ) {
+            this.text++;
+            //console.log(this.mesh.rotation.y + " -- " + camera.rotation.y);
+                //this.mesh.rotation.y =event.getObject().rotation.y*Math.PI;
+                //console.log("camera : "+camera.rotation.z);
+                //console.log(this.mesh.rotation);
+                   
+                //this.mesh.rotation.y = camera.rotation.y;
+                //this.mesh.lookAt(camera.getWorldDirection() );
+                //console.log(camera.rotation)
+                // console.log(event.getObject().rotation );
+            // console.log(this.mesh.rotation );
+            // let target =  new THREE.Vector3( );
+            // target.copy( this.mesh.position ).add( camera.getWorldDirection(target));
+            
+            // this.mesh.lookAt( target );
+        }
+        this.playerData();
+        // } else {
+        //     let mouse = new THREE.Vector2();
+        //     let target = new THREE.Vector2();
+        //     let windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
+        //     mouse.x = ( event.clientX - windowHalf.x );
+        //     mouse.y = ( event.clientY - windowHalf.y );
+
+        //     target.x = ( 1 - mouse.x ) * 0.002;
+
+        //     this.lookingAtY= ( 1 - mouse.y ) * 0.002;
+        //     if (typeof this.mesh != "undefined") {
+        //         camera.lookAt( new THREE.Vector3(this.mesh.position.x,this.mesh.position.y+0.8+this.lookingAtY,this.mesh.position.z));
+        //         this.mesh.rotation.y += 0.05 * ( target.x - this.mesh.rotation.y );
+            
+        //         camera.rotation.y += 0.05 * ( target.x - camera.rotation.y );
+        //     }
+        // }
+        let d = 10;
+        // if (!(this.mesh.position.x > 10 || this.mesh.position.x < -10 || this.mesh.position.z > 10 || this.mesh.position.z < -10)) {
+        //     console.log(light.shadow.camera);
+        //     console.log(light.shadow.camera.left + " = " +( this.mesh.position.x - d));
+        // }
+
+        light.shadow.camera.left = this.mesh.position.x - d;
+        light.shadow.camera.right =  this.mesh.position.x  + d;
+        light.shadow.camera.top =  this.mesh.position.z - d;
+        light.shadow.camera.bottom = this.mesh.position.z+ d;
+
+        // if (!(this.mesh.position.x > 10 || this.mesh.position.x < -10 || this.mesh.position.z > 10 || this.mesh.position.z < -10)) {
+        //     console.log(light.shadow.camera);
+        //     console.log(light.shadow.camera.left + " = " +( this.mesh.position.x - d));
+        // }
+
     };
     
     updatePlayerPosition(data){
@@ -44,6 +95,7 @@ class Player extends THREE.Object3D {
         this.mesh.rotation.x = data.r_x;
         this.mesh.rotation.y = data.r_y;
         this.mesh.rotation.z = data.r_z;
+        
     };
     
     checkKeyStates (){
@@ -62,30 +114,33 @@ class Player extends THREE.Object3D {
             this.clip[18].play();
             this.playerData();
         } else if (this.keyState[37] || this.keyState[65]) {
-            // left arrow or 'a' - rotate left
-            this.mesh.rotation.y += this.turnSpeed;
-            this.playerData();
-        } else if (this.keyState[39] || this.keyState[68]) {
-            // right arrow or 'd' - rotate right
-            this.mesh.rotation.y -= this.turnSpeed;
-            this.playerData();
-        }else if (this.keyState[81]) {
-            // 'q' - strafe left
-            this.mesh.position.x -= this.moveSpeed/2 * Math.cos(this.mesh.rotation.y);
-            this.mesh.position.z += this.moveSpeed/2 * Math.sin(this.mesh.rotation.y);
-            //this.mixer.uncacheAction(clip[0]);
-            // this.clip[0].setLoop( THREE.LoopOnce );
-            // this.clip[0].play();
-            this.playerData();
-        } else if (this.keyState[69]) {
-            // 'e' - strage right
+            // left arrow or 'a' - strage right
+            
             this.mesh.position.x += this.moveSpeed/2 * Math.cos(this.mesh.rotation.y);
             this.mesh.position.z -= this.moveSpeed/2 * Math.sin(this.mesh.rotation.y);
             // console.log(this.mixer.getRoot());
             // console.log(this.clip[10]);
            
-            this.mixer.uncacheAction(this.clip[10]);
-            this.clip[10].setLoop( THREE.LoopOnce );
+            //this.mixer.uncacheAction(this.clip[10]);
+            this.playerData();
+        } else if (this.keyState[39] || this.keyState[68]) {
+            // right arrow or 'd' - strafe left
+            this.mesh.position.x -= this.moveSpeed/2 * Math.cos(this.mesh.rotation.y);
+            this.mesh.position.z += this.moveSpeed/2 * Math.sin(this.mesh.rotation.y);
+            //this.mixer.uncacheAction(clip[0]);
+            // this.clip[0].setLoop( THREE.LoopOnce );
+            // this.clip[0].play();
+            
+            this.playerData();
+        }else if (this.keyState[81]) {
+            // 'q' - rotate left
+           
+            this.mesh.rotation.y += this.turnSpeed;
+            this.playerData();
+        } else if (this.keyState[69]) {
+            // 'e' - rotate right
+            
+            this.mesh.rotation.y -= this.turnSpeed;
             this.playerData();
         } else {
             this.clip[6].play();
@@ -108,8 +163,6 @@ class Player extends THREE.Object3D {
     remove (scene){
         scene.remove( this.player );
     };
-
-
 }
 
 function loadMesh(scene, player, fn) {

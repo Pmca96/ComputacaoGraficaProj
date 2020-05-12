@@ -5,6 +5,7 @@
     <title></title>
     <script src="/socket.io/socket.io.js"></script>
     <script src="/js/libs/buildthree.js" ></script>
+    <script src="/js/libs/pointerLockControls.js" ></script>
     <script src="/js/libs/GLTFLoader.js" ></script>
     <script src="/js/libs/DRACOLoader.js" ></script>
     <script src="/js/libs/OBJLoader.js" ></script>
@@ -24,20 +25,21 @@
 <div id="container"></div>
 <script>
 
-
     var app;
     var socket = io();
-
+    var canvas;
     socket.on('connect', function(){
         app = new Application();
-
+    
         let objs = [
+            new HemisphereLight({x:50, y: 50, z:0}),
             new Fence({x : 1, y : 0, z : 1}),
             new Fence({x : 3, y : 0, z : 3}),
             new Fence({x : 3, y : 0, z : 5})
         ];
         app.add(objs);
         socket.emit('requestOldPlayers', {});
+        
     });
 
     socket.on('updatePosition', function(data){
@@ -55,6 +57,7 @@
         let player = new Player(data);
         app.add(player);
     });
+    
     socket.on('removeOtherPlayer', function(data){
         app.remove(data.playerId);
     });

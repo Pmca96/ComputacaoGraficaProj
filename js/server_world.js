@@ -36,6 +36,7 @@ var removePlayer = function(player){
 
 var updatePlayerData = function(data){
     var player = playerForId(data.playerId);
+
     player.x = data.x;
     player.y = data.y;
     player.z = data.z;
