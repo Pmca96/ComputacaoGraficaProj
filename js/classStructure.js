@@ -205,7 +205,7 @@ class Application {
         //Add SkyBox to the Scene HERE -----------------------
         this.scene.background = new THREE.CubeTextureLoader()
             .setPath( 'images/' )
-            .load( [ 'xpos.png', 'xneg.png',  'zpos.png', 'zneg.png','ypos.png', 'yneg.png' ] );
+            .load( [ 'xneg.png', 'xpos.png',  'zpos.png', 'zneg.png','ypos.png', 'yneg.png' ] );
 
         //Events------------------------------------------
         let Application = this;
