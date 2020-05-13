@@ -41,89 +41,9 @@ class Ligth extends THREE.Object3D{
     constructor( hemiLight, size = 10){
         super();
       this.light = new THREE.HemisphereLightHelper( hemiLight, size);
-    
     }
-
   }
 
-class Fence extends Obj {
-
-    constructor(position) {
-        super();
-        this.createFence(position.x, position.y, position.z);
-    }
-
-    createFence(x, y, z) {
-
-        var group = new THREE.Group();
-        group.add(this.verticalFence(1, 0, 1));
-        group.add(this.verticalFence(3, 0, 1));
-        group.add(this.horizontalFence(2, -0.15, 1));
-        group.add(this.horizontalFence(2, 0.8, 1));
-        group.add(this.obliqualRLFence(2, .3, 1.05));
-        group.add(this.obliqualLRFence(2, .3, 0.95));
-        group.position.set(x, y, z);
-        this.mesh = group;
-        this.mesh.rotation.y = 1;
-    }
-
-    verticalFence(x, y, z) {
-
-        var fenceGeometry = new THREE.CubeGeometry(0.35, 2, 0.35);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
-        fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
-        var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
-        var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
-        fenceCube.position.set(x, y, z);
-        fenceCube.castShadow = true;
-        return fenceCube;
-    }
-
-    horizontalFence(x, y, z) {
-
-        var fenceGeometry = new THREE.CubeGeometry(2, 0.25, 0.2);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
-        fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
-        var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
-        var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
-        fenceCube.position.set(x, y, z);
-        fenceCube.castShadow = true;
-        return fenceCube;
-    }
-
-    obliqualRLFence(x, y, z) {
-
-        var fenceGeometry = new THREE.CubeGeometry(2, 0.25, 0.05);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
-        fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
-        var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
-        var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
-        fenceCube.rotation.z = 0.4;
-        fenceCube.position.set(x, y, z);
-        fenceCube.castShadow = true;
-        return fenceCube;
-    }
-
-    obliqualLRFence(x, y, z) {
-
-        var fenceGeometry = new THREE.CubeGeometry(2, 0.25, 0.05);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
-        fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
-        var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
-        var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
-        fenceCube.rotation.z = -0.4;
-        fenceCube.position.set(x, y, z);
-        fenceCube.castShadow = true;
-        return fenceCube;
-    }
-
-    update(){
-
-    }
-    getMesh() {
-        return this.mesh;
-    }
-}
 
 
 
@@ -146,7 +66,7 @@ class Application {
 
         this.scene = new THREE.Scene();
 
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50);
         this.camera.position.z = 5;
 
         this.camera.position.x = 1 - 3 *  Math.sin( 0 );
@@ -201,6 +121,8 @@ class Application {
         
         this.controls = new THREE.PointerLockControls( this.camera, document.body );
         this.scene.add( this.controls.getObject() );
+
+        this.scene.fog = new THREE.Fog("0xFFFFFF", 10, 50);
 
         //Add SkyBox to the Scene HERE -----------------------
         this.scene.background = new THREE.CubeTextureLoader()
@@ -285,9 +207,14 @@ class Application {
                 } else if (mesh[index] instanceof Player) {
                     mesh[index].createPlayer(this.scene, this.camera, this.light);
                     this.players.push(mesh[index]);
-                }   if (mesh[index] instanceof Ligth){
+                } else if (mesh[index] instanceof Ligth){
                     this.objects.push(mesh[index]);
                     this.scene.add( mesh[index].getLight() );
+                } else if (mesh[index] instanceof Zone) {
+                    mesh[index].objects.map ((i) => {
+                        this.objects.push(i);
+                        this.scene.add(i.getMesh() );
+                    });
                 }
             }
         else 
@@ -300,6 +227,11 @@ class Application {
             } else if (mesh instanceof Ligth){
                 this.objects.push(mesh);
                 this.scene.add( mesh.getLight() );
+            } else if (mesh instanceof Zone) {
+                mesh.objects.map ((i) => {
+                    this.objects.push(i);
+                    this.scene.add(i.getMesh() );
+                });
             }
         
     }

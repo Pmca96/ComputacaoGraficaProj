@@ -11,6 +11,8 @@
     <script src="/js/libs/OBJLoader.js" ></script>
     <!-- <script src="/js/client_world.js" ></script> -->
     <script src="/js/classPlayer.js" ></script>
+    <script src="/js/classFence.js" ></script>
+    <script src="/js/classZone.js" ></script>
     <script src="/js/classStructure.js" ></script>
 
     <style>
@@ -33,9 +35,7 @@
     
         let objs = [
             new HemisphereLight({x:50, y: 50, z:0}),
-            new Fence({x : 1, y : 0, z : 1}),
-            new Fence({x : 3, y : 0, z : 3}),
-            new Fence({x : 3, y : 0, z : 5})
+            new Zone({x : 1, y : 0, z : 1})
         ];
         app.add(objs);
         socket.emit('requestOldPlayers', {});
