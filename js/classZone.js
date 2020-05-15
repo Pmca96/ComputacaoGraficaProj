@@ -9,6 +9,8 @@ class Zone {
 
     createZone() {
         this.createFence();
+        let castle = new Castle({x : 0, y : 0, z :0});
+        this.objects.push(castle);
     }
 
 

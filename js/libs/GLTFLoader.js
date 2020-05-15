@@ -36,7 +36,7 @@ THREE.GLTFLoader = ( function () {
 				resourcePath = this.path;
 
 			} else {
-
+				console.log(url);
 				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
 
 			}

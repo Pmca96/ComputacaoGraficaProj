@@ -167,9 +167,7 @@ class Player extends THREE.Object3D {
 
 function loadMesh(scene, player, fn) {
     let loader = new THREE.GLTFLoader();
-    let dracoLoader = new THREE.DRACOLoader();
-    dracoLoader.setDecoderPath( 'js/libs/DRACOLoader.js' );
-    loader.setDRACOLoader( this.dracoLoader );
+
 
     let currPlayer = this.mesh;
     let xValue = player.x;

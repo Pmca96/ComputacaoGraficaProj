@@ -58,6 +58,14 @@ class Application {
         this.velocity.x = 1;
         this.velocity.z = 1;
         this.createScene();  
+
+        //MAIN OBJECTS TO LOAD
+        this.objs = [
+            new HemisphereLight({x:50, y: 50, z:0}),
+            new Zone({x : 1, y : 0, z : 1})
+        ];
+        
+      
     }
 
     createScene() {
@@ -66,7 +74,7 @@ class Application {
 
         this.scene = new THREE.Scene();
 
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 50);
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
         this.camera.position.z = 5;
 
         this.camera.position.x = 1 - 3 *  Math.sin( 0 );
@@ -122,7 +130,7 @@ class Application {
         this.controls = new THREE.PointerLockControls( this.camera, document.body );
         this.scene.add( this.controls.getObject() );
 
-        this.scene.fog = new THREE.Fog("0xFFFFFF", 10, 50);
+        // this.scene.fog = new THREE.Fog("0xFFFFFF", 10, 50);
 
         //Add SkyBox to the Scene HERE -----------------------
         this.scene.background = new THREE.CubeTextureLoader()
@@ -212,8 +220,13 @@ class Application {
                     this.scene.add( mesh[index].getLight() );
                 } else if (mesh[index] instanceof Zone) {
                     mesh[index].objects.map ((i) => {
-                        this.objects.push(i);
-                        this.scene.add(i.getMesh() );
+                        if (i instanceof Castle) {
+                            console.log(i.getMesh());
+                            this.scene.add(i.getMesh() );
+                        }else {
+                            this.objects.push(i);
+                            this.scene.add(i.getMesh() );
+                        }
                     });
                 }
             }
@@ -241,6 +254,7 @@ class Application {
     }
 
     onMouseClick(event){
+        this.add(this.objs);
         this.controls.lock();
         // let element = document.body;
         // if (document.fullscreenElement) {

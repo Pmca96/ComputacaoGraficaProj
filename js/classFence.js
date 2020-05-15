@@ -2,7 +2,6 @@ class Fence extends THREE.Object3D {
 
     constructor(position) {
         super();
-        console.log(position);
         this.createFence(position.x, position.y, position.z, position.ry);
     }
 
@@ -23,7 +22,7 @@ class Fence extends THREE.Object3D {
     verticalFence(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(0.35, 2, 0.35);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
@@ -35,7 +34,7 @@ class Fence extends THREE.Object3D {
     horizontalFence(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(2, 0.25, 0.2);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
@@ -47,7 +46,7 @@ class Fence extends THREE.Object3D {
     obliqualRLFence(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(2, 0.25, 0.05);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
@@ -60,7 +59,7 @@ class Fence extends THREE.Object3D {
     obliqualLRFence(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(2, 0.25, 0.05);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
