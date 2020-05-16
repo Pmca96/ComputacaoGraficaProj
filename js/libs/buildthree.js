@@ -40170,7 +40170,6 @@
 		},
 
 		extractUrlBase: function ( url ) {
-			console.log(url);
 			var index = url.lastIndexOf( '/' );
 
 			if ( index === - 1 ) { return './'; }

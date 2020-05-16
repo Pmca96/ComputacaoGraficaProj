@@ -36,9 +36,7 @@ THREE.GLTFLoader = ( function () {
 				resourcePath = this.path;
 
 			} else {
-				console.log(url);
 				resourcePath = THREE.LoaderUtils.extractUrlBase( url );
-
 			}
 
 			// Tells the LoadingManager to track an extra item, which resolves after

@@ -52,6 +52,7 @@ class Application {
         this.MainPlayer = "";
         this.clock = new THREE.Clock();
         this.objects = [];
+        this.objectsNoUpdate = [];
         this.players = [];
         this.prevTime = performance.now();
         this.velocity = new THREE.Vector3();
@@ -62,7 +63,9 @@ class Application {
         //MAIN OBJECTS TO LOAD
         this.objs = [
             new HemisphereLight({x:50, y: 50, z:0}),
-            new Zone({x : 1, y : 0, z : 1})
+            new Zone({x : 1, y : 0, z : 1}),
+            new Zone({x : 1, y : 0, z : 1}, -1),
+            new Route({x : 1, y : -0.5, z : 0}),
         ];
         
       
@@ -74,7 +77,7 @@ class Application {
 
         this.scene = new THREE.Scene();
 
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 200);
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100);
         this.camera.position.z = 5;
 
         this.camera.position.x = 1 - 3 *  Math.sin( 0 );
@@ -86,6 +89,7 @@ class Application {
         this.renderer.setSize( window.innerWidth, window.innerHeight);
         this.renderer.domElement.id = 'canvas';
         this.renderer.shadowMap.enabled = true;
+        this.renderer.setPixelRatio( window.devicePixelRatio );
         this.raycaster = new THREE.Raycaster();
 
         // Add Light
@@ -117,7 +121,7 @@ class Application {
         //Add Floor To the Scene HERE-------------------
         this.floorTexture = new THREE.TextureLoader().load("images/grass.png");
         this.floorTexture.wrapS = this.floorTexture.wrapT = THREE.RepeatWrapping; 
-        this.floorTexture.repeat.set( 10, 10 );
+        this.floorTexture.repeat.set( 100, 100 );
         this.floorMaterial = new THREE.MeshPhongMaterial( { map: this.floorTexture, side: THREE.DoubleSide } );
         this.floorGeometry = new THREE.PlaneGeometry(200,200, 10, 10);
         this.floor = new THREE.Mesh(this.floorGeometry, this.floorMaterial);
@@ -154,7 +158,6 @@ class Application {
     
 
         this.render();
-        //this.animate();
 
     }
 
@@ -173,7 +176,7 @@ class Application {
             this.render();
           });
         this.objects.forEach((object) => {
-            if(object instanceof Obj)
+            if(object instanceof Turret)
               object.update();
           });
         
@@ -209,40 +212,38 @@ class Application {
         
         if (Array.isArray(mesh))
             for(var index in mesh) {
-                if (mesh[index] instanceof Obj) {
-                    this.objects.push(mesh[index]);
+                if (mesh[index] instanceof Land ) {
+                    this.objectsNoUpdate.push(mesh[index]);
+                    this.scene.add(mesh[index].getMesh());
+                } else if (mesh[index] instanceof Obj  ) {
+                    this.objectsNoUpdate.push(mesh[index]);
                     this.scene.add(mesh[index].getMesh() );
                 } else if (mesh[index] instanceof Player) {
                     mesh[index].createPlayer(this.scene, this.camera, this.light);
                     this.players.push(mesh[index]);
                 } else if (mesh[index] instanceof Ligth){
-                    this.objects.push(mesh[index]);
+                    this.objectsNoUpdate.push(mesh[index]);
                     this.scene.add( mesh[index].getLight() );
                 } else if (mesh[index] instanceof Zone) {
                     mesh[index].objects.map ((i) => {
-                        if (i instanceof Castle) {
-                            console.log(i.getMesh());
-                            this.scene.add(i.getMesh() );
-                        }else {
-                            this.objects.push(i);
-                            this.scene.add(i.getMesh() );
-                        }
+                        this.objectsNoUpdate.push(i);
+                        this.scene.add(i.getMesh() );
                     });
                 }
             }
         else 
             if (mesh instanceof Obj) {
-                this.objects.push(mesh.player);
+                this.objectsNoUpdate.push(mesh.player);
                 this.scene.add(mesh.getMesh() );
             } else if (mesh instanceof Player) {
                 mesh.createPlayer(this.scene, this.camera, this.light);
                 this.players.push(mesh);
             } else if (mesh instanceof Ligth){
-                this.objects.push(mesh);
+                this.objectsNoUpdate.push(mesh);
                 this.scene.add( mesh.getLight() );
             } else if (mesh instanceof Zone) {
-                mesh.objects.map ((i) => {
-                    this.objects.push(i);
+                mesh.objectsNoUpdate.map ((i) => {
+                    this.objectsNoUpdate.push(i);
                     this.scene.add(i.getMesh() );
                 });
             }
@@ -250,6 +251,7 @@ class Application {
     }
 
     remove(id) {
+        console.log(id);
         this.scene.remove( this.playerForId(id).mesh );
     }
 
@@ -312,6 +314,7 @@ class Application {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize( window.innerWidth, window.innerHeight );
+        this.renderer.setPixelRatio( window.devicePixelRatio );
         this.render();
     }
 

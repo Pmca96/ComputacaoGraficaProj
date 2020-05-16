@@ -31,7 +31,10 @@ io.on('connection', function(socket){
         }
     });
     socket.on('updatePosition', function(data){
+        if ( data.x === undefined)
+            return 0;
         var newData = world.updatePlayerData(data);
+        
         socket.broadcast.emit('updatePosition', newData);
     });
     socket.on('disconnect', function(){
