@@ -11,8 +11,12 @@ class Castle extends THREE.Object3D {
     }
     
     createCastle(){
-        let path = "models/Castle/castle.gltf";
-        let material = "models/Castle/base_color.png";
+        // let path = "models/Castle/castle.gltf";
+        // let material = "models/Castle/base_color.png";
+   
+        let path = "models/castelo/scene.gltf";
+        let material = "";
+        
         loadMesh1(path, material, this, function (fn) {
             
             fn.setMesh(fn.mesh);
@@ -69,9 +73,10 @@ function loadMesh1(path, textureM, objectClass, fn) {
         objectClass.mesh.position.y = yValue;
         objectClass.mesh.position.z = zValue;
 
-        objectClass.mesh.scale.x = 0.1;
-        objectClass.mesh.scale.y = 0.1;
-        objectClass.mesh.scale.z = 0.1;
+
+        objectClass.mesh.scale.x = 1;
+        objectClass.mesh.scale.y = 1;
+        objectClass.mesh.scale.z = 1;
 
         fn(objectClass);
     } );
