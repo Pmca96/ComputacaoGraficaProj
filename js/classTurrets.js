@@ -9,8 +9,6 @@ class TurretFree extends Turret {
     constructor(position) {
         super();
         this.createSpace(position);
-
-        
     }
 
     createSpace(position){

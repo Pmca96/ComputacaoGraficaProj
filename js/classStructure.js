@@ -90,6 +90,7 @@ class Application {
         this.renderer.domElement.id = 'canvas';
         this.renderer.shadowMap.enabled = true;
         this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer.getMaxAnisotropy();
         this.raycaster = new THREE.Raycaster();
 
         // Add Light

@@ -1,13 +1,25 @@
 // store all players
 var players = [];
+var wc1 = 0;
+var wc2 = 0;
 
-function Player(type = 0){
+function Player(){
     this.playerId = players.length;
-    if (type == 1) {
-        this.x = 1;
+    console.log(players.length);
+    if (wc1 == 0) {
+        this.wc = 1;
+        wc1=1;
+        this.x = -55;
         this.y = 0.7;
-        this.z = 1;
+        this.z = 20;
+    } else if (wc2 == 0) {
+        this.wc = 2;
+        wc2=1;
+        this.x = 55;
+        this.y = 0.7;
+        this.z = -20;
     } else {
+        this.wc = 0;
         this.x = 1;
         this.y = 0.7;
         this.z = 1;
@@ -32,7 +44,10 @@ var addPlayer = function(id){
 };
 
 var removePlayer = function(player){
-
+    if (player.wc == 1)
+        wc1 = 0;
+    if (player.wc == 2)
+        wc2 = 0;
     var index = players.indexOf(player);
 
     if (index > -1) {
@@ -42,8 +57,14 @@ var removePlayer = function(player){
 
 var updatePlayerData = function(data){
     var player = playerForId(data.playerId);
-   
+try {
+
     player.x = data.x;
+}
+catch(Exeception ) {
+    console.log("2")
+    return 0;
+}
     player.y = data.y;
     player.z = data.z;
     player.r_x = data.r_x;

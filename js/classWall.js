@@ -20,10 +20,10 @@ class Wall extends THREE.Object3D {
     backWall(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(2, 7, 120);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/stonewall2.jpg");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         fenceTexture.offset.set( 0, 0);
-        fenceTexture.repeat.set( 6, 20);
+        fenceTexture.repeat.set( 40, 4);
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
         fenceCube.position.set(x, y, z);
@@ -34,10 +34,10 @@ class Wall extends THREE.Object3D {
     lrWall(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(60, 7, 2);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/stonewall2.jpg");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         fenceTexture.offset.set( 0, 0);
-        fenceTexture.repeat.set( 6, 20);
+        fenceTexture.repeat.set( 40, 4);
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
         fenceCube.position.set(x, y, z);
@@ -48,10 +48,10 @@ class Wall extends THREE.Object3D {
     frontWall(x, y, z) {
 
         var fenceGeometry = new THREE.CubeGeometry(2, 7, 55);
-        var fenceTexture = new THREE.TextureLoader().load("images/wood64x64.png");
+        var fenceTexture = new THREE.TextureLoader().load("images/stonewall2.jpg");
         fenceTexture.wrapS = fenceTexture.wrapT = THREE.RepeatWrapping;
         fenceTexture.offset.set( 0, 0);
-        fenceTexture.repeat.set( 6, 20);
+        fenceTexture.repeat.set( 40, 4);
         var fenceMaterial = new THREE.MeshPhongMaterial( { map: fenceTexture, side: THREE.DoubleSide });
         var fenceCube = new THREE.Mesh( fenceGeometry, fenceMaterial );
         fenceCube.position.set(x, y, z);

@@ -193,7 +193,7 @@ class skyTower extends Buildings {
         this.scale.y = 0.2;
         this.scale.z = 0.2;
         if (inv != 1)
-        this.rotation.y = Math.PI;
+            this.rotation.y = Math.PI;
    
         loadMesh1(path, material, this, function (fn) {
 
