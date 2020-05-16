@@ -6,14 +6,14 @@ class Turret extends THREE.Object3D {
 }
 
 class TurretFree extends Turret {
-    constructor(position,rotation) {
+    constructor(position) {
         super();
-        this.createSpace(position, rotation);
+        this.createSpace(position);
 
         
     }
 
-    createSpace(position, rotation){
+    createSpace(position){
         var group = new THREE.Group();
         group.add(this.createCircle1(0, 0, 0));
         group.add(this.createCircle2(0, -0.01, 0));
@@ -22,9 +22,6 @@ class TurretFree extends Turret {
 
         group.position.set(position.x, position.y, position.z);
         this.mesh = group;
-        this.mesh.rotation.x = rotation.x;
-        this.mesh.rotation.z = rotation.z;
-        this.mesh.rotation.y = rotation.y;
         this.mesh.receiveShadow = true;
     }
 

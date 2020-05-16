@@ -65,7 +65,7 @@ class Application {
             new HemisphereLight({x:50, y: 50, z:0}),
             new Zone({x : 1, y : 0, z : 1}),
             new Zone({x : 1, y : 0, z : 1}, -1),
-            new Route({x : 1, y : -0.5, z : 0}),
+            new Route({x : 0, y : -0.5, z : 0}),
         ];
         
       
@@ -77,7 +77,7 @@ class Application {
 
         this.scene = new THREE.Scene();
 
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 100);
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 75);
         this.camera.position.z = 5;
 
         this.camera.position.x = 1 - 3 *  Math.sin( 0 );
@@ -112,7 +112,7 @@ class Application {
         this.light.shadow.mapSize.width = 2048;
         this.light.shadow.mapSize.height = 2048;
 
-        this.light.shadow.camera.far = 500;
+        this.light.shadow.camera.far = 50;
         this.light.shadow.camera.near = 0.5;
         // this.light.shadow.bias = - 0.0001;
         this.light.matrixAutoUpdate  = true;
