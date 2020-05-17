@@ -1,4 +1,8 @@
-class Zone {
+
+import { TurretFree, Turret,Turret1,Turret2  } from './classTurrets.js';
+import {Castle,Market,whaleHouse, witchHouse,skyTower, Toilet} from './classBuildings.js';
+import {Labyrinth} from './classLands.js';
+export default class Zone {
     constructor( data , inv = 1){
         this.x = data.x;
         this.y = data.y;
@@ -9,8 +13,11 @@ class Zone {
     }
 
     createZone() {
-        let wall1 = new Wall({x : 0, y : 0, z : 0}, this.inv);
-        this.objects.push(wall1);
+        let wall = new Wall({x : 0, y : 0, z : 0}, this.inv);
+        this.objects.push(wall);
+
+        let labyrinth = new Labyrinth({x : 0, y : 0, z : 0}, this.inv);
+        this.objects.push(labyrinth);
 
         this.createBuildings();
         this.createTurrets();  
@@ -20,7 +27,20 @@ class Zone {
     createTurrets (){
         let turret = new TurretFree({x : -30*this.inv, y : -0.4, z :20 *this.inv});
         this.objects.push(turret);
-        turret = new TurretFree({x : -30*this.inv, y : -0.4, z :-20 *this.inv});
+        turret = new TurretFree({x : -50*this.inv, y : -0.4, z :-20 *this.inv});
+        this.objects.push(turret);
+
+        turret = new Turret2({x : -40*this.inv, y : -0.4, z :30 *this.inv});
+        turret.levelUp();
+        this.objects.push(turret);
+
+        turret = new Turret2({x : -40*this.inv, y : -0.4, z :-30 *this.inv});
+        this.objects.push(turret);
+        
+        turret = new Turret1({x : -50*this.inv, y : -0.4, z :40 *this.inv});
+        this.objects.push(turret);
+        turret = new Turret1({x : -50*this.inv, y : -0.4, z :-40 *this.inv});
+        turret.levelUp();
         this.objects.push(turret);
     }
 
@@ -36,10 +56,8 @@ class Zone {
         this.objects.push(whaleH0, whaleH1);
 
         let witchH0 = new witchHouse({x : -50*this.inv, y : -0.7, z : -80*this.inv}, {y :  Math.PI / 2},  this.inv);
-        // let witchH1 = new witchHouse({x : -80*this.inv, y : -0.7, z : -70*this.inv}, {y : 1});
-        // let witchH2 = new witchHouse({x : -25*this.inv, y : -0.7, z : -80*this.inv}, {y : 0});
-        let witchH3 = new witchHouse({x : -88*this.inv, y : -0.7, z : -34*this.inv}, {y : Math.PI / 2},  this.inv);
-        this.objects.push(witchH0, witchH3);
+        let witchH1 = new witchHouse({x : -88*this.inv, y : -0.7, z : -34*this.inv}, {y : Math.PI / 2},  this.inv);
+        this.objects.push(witchH0, witchH1);
 
         let skyPillar = new skyTower({x : -30*this.inv, y : 50, z : -30*this.inv},  this.inv);
         this.objects.push(skyPillar);

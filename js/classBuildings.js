@@ -209,11 +209,7 @@ class skyTower extends Buildings {
 
 
 function loadMesh1(path, textureM, objectClass, fn) {
- 
     let loader = new THREE.GLTFLoader();
- 
-
-    let currPlayer = this.mesh;
 
     let textureLoader;
     let texture;
@@ -253,3 +249,6 @@ function loadMesh1(path, textureM, objectClass, fn) {
         fn(objectClass);
     } );
 }
+
+
+export { Castle,Market,whaleHouse, witchHouse,skyTower , Toilet};

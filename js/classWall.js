@@ -11,15 +11,12 @@ class Wall extends THREE.Object3D {
     createWall(x, y, z, inv) {
 
         var group = new THREE.Group();
-        group.add(this.backWall(-70*inv, 1.0, 0));
-        group.add(this.lrWall(-40*inv, 1.0, -59));
-        group.add(this.lrWall(-40*inv, 1.0, 59));
-        group.add(this.frontWall(-11*inv, 1.0, 31.5));
-        group.add(this.frontWall(-11*inv, 1.0, -31.5));
-        
-        
-        //group.add(this.towerWall(0, 0,0 ));
-
+        group.add(this.backWall(-70*inv, 1, 0));
+        group.add(this.lrWall(-40*inv, 1, -59));
+        group.add(this.lrWall(-40*inv, 1, 59));
+        group.add(this.frontWall(-11*inv, 1, 31.5));
+        group.add(this.frontWall(-11*inv, 1, -31.5));
+    
         group.add(this.towerWall(-11*inv, 1, 5));
         group.add(this.towerWall(-11*inv, 1, -5));
         group.add(this.towerWall(-11.5*inv, 1, -58.2));
@@ -100,33 +97,8 @@ class Wall extends THREE.Object3D {
         return cylinder;
     }
 
-    // towerWall(x, y, z) {
-    //     let cyli = new THREE.CylinderGeometry( 2, 2, 5, 20 );
 
-    //     let cube = new THREE.Mesh( new THREE.BoxGeometry( 4,4,4,1 ));
-
-    //     let material = new THREE.TextureLoader().load("images/stonewall2.jpg");
-
-    //     material.wrapS = material.wrapT = THREE.RepeatWrapping;
-    //     material.offset.set( 0, 0);
-    //     material.repeat.set( 10, 2.5);
-    //     let stoneMaterial = new THREE.MeshPhongMaterial( { map: material, side: THREE.DoubleSide });
-        
-    //     let meshA = new THREE.Mesh( cyli );
-    //     meshA.position.set(x, y, z);
-
-    //     var cyli_bsp = new ThreeBSP( meshA );
-    //     var cube_bsp = new ThreeBSP( cube );
-
-    //     var subtract_bsp = cyli_bsp.subtract( cube_bsp );
-    //     var result = subtract_bsp.toMesh( stoneMaterial);
-
-	// 	result.geometry.computeVertexNormals();
-
-    //     result.castShadow = true;
-    //     return result;
-    // }
-
+ 
     towerDoors(x, y, z, ry) {
         var geometry = new THREE.BoxGeometry( 0.2, 2.25, 1.25, 20 );
         var material = new THREE.TextureLoader().load("images/door1.png");

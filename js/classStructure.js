@@ -1,3 +1,9 @@
+
+import  {Turret} from './classTurrets.js';
+import  Zone from './classZone.js';
+import  Player from './classPlayer.js';
+import {Fire}  from './libs/fire.js';
+import  {Land, Route} from './classLands.js';
 class Obj extends THREE.Object3D{
     constructor(x,y,z){
         super();
@@ -47,7 +53,7 @@ class Ligth extends THREE.Object3D{
 
 
 
-class Application {
+export default class Application {
     constructor() {
         this.MainPlayer = "";
         this.clock = new THREE.Clock();
@@ -85,7 +91,7 @@ class Application {
         this.camera.position.z = 1 - 3 * Math.cos( 0 );
         this.camera.lookAt( new THREE.Vector3(1,0+0.8,1));
 
-        this.renderer = new THREE.WebGLRenderer( { alpha: true} );
+        this.renderer = new THREE.WebGLRenderer( { antialias: true, alpha: true} );
         this.renderer.setSize( window.innerWidth, window.innerHeight);
         this.renderer.domElement.id = 'canvas';
         this.renderer.shadowMap.enabled = true;
@@ -142,7 +148,39 @@ class Application {
             .setPath( 'images/' )
             .load( [ 'xneg.png', 'xpos.png',  'zpos.png', 'zneg.png','ypos.png', 'yneg.png' ] );
 
-        //Events------------------------------------------
+
+
+            var geometry = new THREE.PlaneBufferGeometry( 20, 20 );
+            var material = new THREE.MeshBasicMaterial( {color: 0xffff00, side: THREE.DoubleSide} );
+            var plane = new THREE.Mesh( geometry, material );
+
+            //this.scene.add( plane );
+
+            let fire = new Fire( geometry, {
+                textureWidth: 512,
+                textureHeight: 512,
+                debug: true
+            } );
+            fire.color1 = 0xffdcaa;
+            fire.color2 = 0xffa000;
+            fire.color3 = 0x000000;
+            fire.windX = 0.0;
+            fire.windY = 2.75;
+            fire.colorBias = 0.9;
+            fire.burnRate = 0;
+            fire.diffuse = 1.33;
+            fire.viscosity = 0.25;
+            fire.expansion = 1;
+            fire.swirl = 50.0;
+            fire.drag = 1;
+            fire.airSpeed = 50.0;
+            fire.speed = 500.0;
+            fire.massConservation = false;
+            fire.position.z = 2;
+            console.log(fire);
+            this.scene.add(fire);
+
+            //Events------------------------------------------
         let Application = this;
         document.addEventListener('click', function(e) { Application.onMouseClick(e) }, false );
         document.addEventListener('mousedown', this.onMouseDown(), false);
@@ -163,9 +201,7 @@ class Application {
     }
 
     animate(){
-        requestAnimationFrame( () => {
-            this.render();
-          });
+        requestAnimationFrame(animate);
         
       
                 
@@ -227,7 +263,10 @@ class Application {
                     this.scene.add( mesh[index].getLight() );
                 } else if (mesh[index] instanceof Zone) {
                     mesh[index].objects.map ((i) => {
-                        this.objectsNoUpdate.push(i);
+                        if (i instanceof Turret)
+                            this.objects.push(i);
+                        else
+                            this.objectsNoUpdate.push(i);
                         this.scene.add(i.getMesh() );
                     });
                 }
@@ -244,7 +283,10 @@ class Application {
                 this.scene.add( mesh.getLight() );
             } else if (mesh instanceof Zone) {
                 mesh.objectsNoUpdate.map ((i) => {
-                    this.objectsNoUpdate.push(i);
+                    if (i instanceof Turret)
+                        this.objects.push(i);
+                    else
+                        this.objectsNoUpdate.push(i);
                     this.scene.add(i.getMesh() );
                 });
             }
@@ -355,4 +397,5 @@ class Application {
         return this.players[i];
     };
 }
+
 

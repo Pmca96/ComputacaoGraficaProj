@@ -3,19 +3,13 @@
 <head lang="en">
     <meta charset="UTF-8">
     <title></title>
-    <script src="/socket.io/socket.io.js"></script>
     <script src="/js/libs/buildthree.js" ></script>
-    <script src="/js/libs/csg.js" ></script>
+    <script src="/socket.io/socket.io.js"></script>
     <script src="/js/libs/pointerLockControls.js" ></script>
     <script src="/js/libs/GLTFLoader.js" ></script>
     <!-- <script src="/js/client_world.js" ></script> -->
-    <script src="/js/classPlayer.js" ></script>
-    <script src="/js/classLands.js" ></script>
-    <script src="/js/classBuildings.js" ></script>
-    <script src="/js/classTurrets.js" ></script>
+
     <script src="/js/classWall.js" ></script>
-    <script src="/js/classZone.js" ></script>
-    <script src="/js/classStructure.js" ></script>
 
     <style>
         body {
@@ -27,37 +21,6 @@
 <body>
 
 <div id="container"></div>
-<script>
-
-    var app;
-    var socket = io();
-    var canvas;
-    socket.on('connect', function(){
-        app = new Application();
-        socket.emit('requestOldPlayers', {});
-        
-    });
-
-    socket.on('updatePosition', function(data){
-        var player = app.playerForId(data.playerId);
-        player.updatePlayerPosition(data);
-    });
- 
-    socket.on('createPlayer', function(data){
-        let mainPlayer = new Player(data);
-        app.add(mainPlayer);
-        app.setMainPlayer(mainPlayer);
-        
-    });
-    socket.on('addOtherPlayer', function(data){
-        let player = new Player(data);
-        app.add(player);
-    });
-    
-    socket.on('removeOtherPlayer', function(data){
-        app.remove(data.playerId);
-    });
-
-</script>
+<script type="module" src="/js/main.js"></script>
 </body>
 </html>

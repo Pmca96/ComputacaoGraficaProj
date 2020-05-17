@@ -1,4 +1,6 @@
-class Player extends THREE.Object3D {
+
+import socket from './main.js';
+export default class Player extends THREE.Object3D {
     constructor( data ){
         super();
         this.playerId = data.playerId;
@@ -169,7 +171,6 @@ function loadMesh(scene, player, fn) {
     let loader = new THREE.GLTFLoader();
 
 
-    let currPlayer = this.mesh;
     let xValue = player.x;
     let yValue = player.y;
     let zValue = player.z;
