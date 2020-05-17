@@ -30,7 +30,7 @@ class Ligth extends THREE.Object3D{
   class HemisphereLight extends Ligth{
     constructor(position){
       super(position);
-      this.light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.4);
+      this.light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.5);
       this.light.position.set( position.x,position.y,position.z );
       this.light.groundColor.setHSL( 0.095, 1, 0.75 );
       this.light.color.setHSL( 0.6, 1, 0.6 );
@@ -90,7 +90,7 @@ class Application {
         this.renderer.domElement.id = 'canvas';
         this.renderer.shadowMap.enabled = true;
         this.renderer.setPixelRatio( window.devicePixelRatio );
-        this.renderer.getMaxAnisotropy();
+        //this.renderer.getMaxAnisotropy();
         this.raycaster = new THREE.Raycaster();
 
         // Add Light

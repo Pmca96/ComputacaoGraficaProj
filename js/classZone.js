@@ -30,15 +30,15 @@ class Zone {
         let wc = new Toilet({x : -55*this.inv, y : -0.7, z : 20*this.inv},  this.inv);
         this.objects.push(castle, market, wc);
         
-        let whaleH0 = new whaleHouse({x : -50*this.inv, y : -0.7, z : 75*this.inv}, {y : Math.PI / 2},  this.inv);
-        let whaleH1 = new whaleHouse({x : -80*this.inv, y : -0.7, z : 34*this.inv}, {y : 0},  this.inv);
+        let whaleH0 = new whaleHouse({x : -50*this.inv, y : -0.7, z : 80*this.inv}, {y : Math.PI / 2},  this.inv);
+        let whaleH1 = new whaleHouse({x : -85*this.inv, y : -0.7, z : 34*this.inv}, {y : 0},  this.inv);
         
         this.objects.push(whaleH0, whaleH1);
 
-        let witchH0 = new witchHouse({x : -50*this.inv, y : -0.7, z : -75*this.inv}, {y : 0},  this.inv);
+        let witchH0 = new witchHouse({x : -50*this.inv, y : -0.7, z : -80*this.inv}, {y :  Math.PI / 2},  this.inv);
         // let witchH1 = new witchHouse({x : -80*this.inv, y : -0.7, z : -70*this.inv}, {y : 1});
         // let witchH2 = new witchHouse({x : -25*this.inv, y : -0.7, z : -80*this.inv}, {y : 0});
-        let witchH3 = new witchHouse({x : -80*this.inv, y : -0.7, z : -34*this.inv}, {y : Math.PI / 2},  this.inv);
+        let witchH3 = new witchHouse({x : -88*this.inv, y : -0.7, z : -34*this.inv}, {y : Math.PI / 2},  this.inv);
         this.objects.push(witchH0, witchH3);
 
         let skyPillar = new skyTower({x : -30*this.inv, y : 50, z : -30*this.inv},  this.inv);

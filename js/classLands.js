@@ -24,7 +24,6 @@ class Route extends Land {
     }
     
     getMesh() {
-        console.log(this.mesh);
         return this.mesh;
     }           
 
