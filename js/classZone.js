@@ -19,27 +19,27 @@ export default class Zone {
         let labyrinth = new Labyrinth({x : 0, y : 0, z : 0}, this.inv);
         this.objects.push(labyrinth);
 
-        this.createBuildings();
+        //this.createBuildings();
         this.createTurrets();  
        
     }
 
     createTurrets (){
-        let turret = new TurretFree({x : -30*this.inv, y : -0.4, z :20 *this.inv});
+        let turret = new TurretFree({x : -27*this.inv, y : -0.4, z :20 *this.inv});
         this.objects.push(turret);
-        turret = new TurretFree({x : -50*this.inv, y : -0.4, z :-20 *this.inv});
+        turret = new TurretFree({x : -38*this.inv, y : -0.4, z :-16 *this.inv});
         this.objects.push(turret);
 
-        turret = new Turret2({x : -40*this.inv, y : -0.4, z :30 *this.inv});
+        turret = new Turret2({x : -33*this.inv, y : -0.4, z :27 *this.inv});
         turret.levelUp();
         this.objects.push(turret);
 
-        turret = new Turret2({x : -40*this.inv, y : -0.4, z :-30 *this.inv});
+        turret = new Turret2({x : -28*this.inv, y : -0.4, z :-30 *this.inv});
         this.objects.push(turret);
         
-        turret = new Turret1({x : -50*this.inv, y : -0.4, z :40 *this.inv});
+        turret = new Turret1({x : -36*this.inv, y : -0.4, z :6 *this.inv});
         this.objects.push(turret);
-        turret = new Turret1({x : -50*this.inv, y : -0.4, z :-40 *this.inv});
+        turret = new Turret1({x : -48*this.inv, y : -0.4, z :-35 *this.inv});
         turret.levelUp();
         this.objects.push(turret);
     }
