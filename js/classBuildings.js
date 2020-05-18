@@ -107,23 +107,23 @@ class Toilet extends Buildings {
 
 }
 
-class whaleHouse extends Buildings {
+class MedievalHouse extends Buildings {
 
     constructor(position, rotation, inv) {
         super();
-        this.createWhaleHouse(position.x, position.y, position.z, rotation.y, inv);
+        this.createHouse(position.x, position.y, position.z, rotation.y, inv);
     }
 
-    createWhaleHouse(x, y, z, rt, inv){
-        let path = "models/whale_house/scene.gltf";
+    createHouse(x, y, z, rt, inv){
+        let path = "models/medieval_house/scene.gltf";
         let material = "";
 
         this.position.x = x;
         this.position.y = y;
         this.position.z = z;
-        this.scale.x = 1;
-        this.scale.y = 1;
-        this.scale.z = 1;
+        this.scale.x = 0.4;
+        this.scale.y = 0.4;
+        this.scale.z = 0.4;
         if (inv != 1)
             this.rotation.y = rt+Math.PI;
         else
@@ -140,29 +140,27 @@ class whaleHouse extends Buildings {
     }
 }
 
-
-class witchHouse extends Buildings {
+class Houses extends Buildings {
 
     constructor(position, rotation, inv) {
         super();
-        this.createWitchHouse(position.x, position.y, position.z, rotation.y, inv);
+        this.createHouse(position.x, position.y, position.z, rotation.y, inv);
     }
 
-    createWitchHouse(x, y, z, rt, inv){
-        let path = "models/witchs_cottage/scene.gltf";
+    createHouse(x, y, z, rt, inv){
+        let path = "models/fantasy_house/scene.gltf";
         let material = "";
 
         this.position.x = x;
         this.position.y = y;
         this.position.z = z;
-        this.scale.x = 0.2;
-        this.scale.y = 0.2;
-        this.scale.z = 0.2;
+        this.scale.x = 0.04;
+        this.scale.y = 0.04;
+        this.scale.z = 0.04;
         if (inv != 1)
             this.rotation.y = rt+Math.PI;
         else
             this.rotation.y = rt;
-
         loadMesh1(path, material, this, function (fn) {
 
         });
@@ -175,7 +173,108 @@ class witchHouse extends Buildings {
     }
 }
 
-class skyTower extends Buildings {
+class FantasyHouses extends Buildings {
+
+    constructor(position, rotation, inv) {
+        super();
+        this.createHouse(position.x, position.y+8, position.z, rotation.y, inv);
+    }
+
+    createHouse(x, y, z, rt, inv){
+        let path = "models/fantasy_house1/scene.gltf";
+        let material = "";
+
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
+        this.scale.x = 8;
+        this.scale.y = 8;
+        this.scale.z = 8;
+        if (inv != 1)
+            this.rotation.y = rt+Math.PI;
+        else
+            this.rotation.y = rt;
+        loadMesh1(path, material, this, function (fn) {
+
+        });
+    }
+
+    getMesh() {
+        return this.mesh;
+    }
+    update(){
+    }
+}
+
+class LittlePolly extends Buildings {
+
+    constructor(position, rotation, inv) {
+        super();
+        this.createPolly(position.x, position.y+6.5, position.z, rotation.y, inv);
+    }
+
+    createPolly(x, y, z, rt, inv){
+        let path = "models/littlePolly/scene.gltf";
+        let material = "";
+
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
+        this.scale.x = 7;
+        this.scale.y = 7;
+        this.scale.z = 7;
+        if (inv != 1)
+            this.rotation.y = rt+Math.PI;
+        else
+            this.rotation.y = rt;
+        loadMesh1(path, material, this, function (fn) {
+
+        });
+    }
+
+    getMesh() {
+        return this.mesh;
+    }
+    update(){
+    }
+}
+
+class Forge extends Buildings {
+
+    constructor(position, rotation, inv) {
+        super();
+        this.createForge(position.x, position.y, position.z, rotation.y, inv);
+    }
+
+    createForge(x, y, z, rt, inv){
+        let path = "models/forge/scene.gltf";
+        let material = "";
+
+        this.position.x = x;
+        this.position.y = y;
+        this.position.z = z;
+        this.scale.x = 0.01;
+        this.scale.y = 0.01;
+        this.scale.z = 0.01;
+        if (inv != 1)
+            this.rotation.y = rt+Math.PI;
+        else
+            this.rotation.y = rt;
+
+        loadMesh1(path, material, this, function (fn) {
+
+        });
+    }
+
+    getMesh() {
+        
+        return this.mesh.traverse();
+    }
+    update(){
+    }
+}
+
+class SkyTower extends Buildings {
 
     constructor(position, inv) {
         super();
@@ -196,7 +295,6 @@ class skyTower extends Buildings {
             this.rotation.y = Math.PI;
    
         loadMesh1(path, material, this, function (fn) {
-
         });
     }
 
@@ -251,4 +349,4 @@ function loadMesh1(path, textureM, objectClass, fn) {
 }
 
 
-export { Castle,Market,whaleHouse, witchHouse,skyTower , Toilet};
+export { Castle,Market,MedievalHouse, Forge,SkyTower ,Houses, Toilet, FantasyHouses,LittlePolly};
