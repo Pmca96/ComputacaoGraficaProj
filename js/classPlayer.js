@@ -22,8 +22,16 @@ export default class Player extends THREE.Object3D {
     }
 
     createPlayer(scene,camera, light){
+        
+           
         loadMesh(scene, this, function (fn) {
+            if (fn.position.x == -55)
+                fn.rotation.y = Math.PI;
             fn.updateCameraPosition(camera, light, 1);
+            if (fn.position.x == -55)
+                camera.lookAt(fn.position.x + 10 , fn.position.y, fn.position.z +2 );
+            else
+                camera.lookAt(fn.position.x - 10 , fn.position.y, fn.position.z +2 );
         });
     };
 
@@ -34,7 +42,7 @@ export default class Player extends THREE.Object3D {
     updateCameraPosition(camera, light, event){
 
         camera.position.x = this.mesh.position.x - 0 *  Math.sin( this.mesh.rotation.y );
-        camera.position.y = this.mesh.position.y + 1.5 ;
+        camera.position.y = this.mesh.position.y + 1 ;
         camera.position.z = this.mesh.position.z - 0 * Math.cos( this.mesh.rotation.y );
         if (event != null  && this.text != 200 ) {
             this.text++;
@@ -53,7 +61,7 @@ export default class Player extends THREE.Object3D {
             
             // this.mesh.lookAt( target );
         }
-        this.playerData();
+        //this.playerData();
         // } else {
         //     let mouse = new THREE.Vector2();
         //     let target = new THREE.Vector2();
