@@ -24,7 +24,6 @@ class Castle extends Buildings {
 
         if (inv != 1)
             this.rotation.y = Math.PI;
-        console.log(this.rotation.y);
         loadMesh1(path, material, this, function (fn) {
 
         });
@@ -292,7 +291,6 @@ class Wolf extends Buildings {
             this.rotation.y = Math.PI;
    
         loadMesh1(path, material, this, function (fn) {
-            console.log(fn);
         });
     }
 
@@ -342,7 +340,6 @@ function loadMesh1(path, textureM, objectClass, fn) {
         if (objectClass instanceof Wolf)  {
             objectClass.clip = [];
             objectClass.animations = gltf.animations;
-            console.log(gltf.animations);
             objectClass.mixer = new THREE.AnimationMixer( objectClass.mesh );
             objectClass.animations.map((v,i) => {
                 objectClass.clip[i] = objectClass.mixer.clipAction(v);

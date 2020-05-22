@@ -100,6 +100,8 @@ export default class Application {
         //this.renderer.getMaxAnisotropy();
         this.raycaster = new THREE.Raycaster();
 
+
+        
         // Add Light
         this.light = new THREE.DirectionalLight( 0xffffff );
         this.light.color.setHSL( 0.1, 1, 0.95 );
@@ -176,6 +178,24 @@ export default class Application {
 
             //Events------------------------------------------
         let Application = this;
+
+        var blocker = document.getElementById( 'blocker' );
+        var instructions = document.getElementById( 'instructions' );
+        let controls = this.controls;
+        instructions.addEventListener( 'click', function () {
+            controls.lock();
+        }, false );
+
+        controls.addEventListener( 'lock', function () {
+            instructions.style.display = 'none';
+            blocker.style.display = 'none';
+        } );
+
+        controls.addEventListener( 'unlock', function () {
+            blocker.style.display = 'block';
+            instructions.style.display = '';
+        } );
+
         document.addEventListener('click', function(e) { Application.onMouseClick(e) }, false );
         document.addEventListener('mousedown', this.onMouseDown(), false);
         document.addEventListener('mouseup', this.onMouseUp(), false);
@@ -287,7 +307,6 @@ export default class Application {
     }
 
     remove(id) {
-        console.log(id);
         this.scene.remove( this.playerForId(id).mesh );
     }
 

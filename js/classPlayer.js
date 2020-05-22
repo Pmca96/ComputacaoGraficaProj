@@ -44,8 +44,28 @@ export default class Player extends THREE.Object3D {
         camera.position.x = this.mesh.position.x - 0 *  Math.sin( this.mesh.rotation.y );
         camera.position.y = this.mesh.position.y + 1 ;
         camera.position.z = this.mesh.position.z - 0 * Math.cos( this.mesh.rotation.y );
-        if (event != null  && this.text != 200 ) {
-            this.text++;
+        if (event != null ) {
+            //https://stackoverflow.com/questions/14813902/three-js-get-the-direction-in-which-the-camera-is-looking
+             let vector = new THREE.Vector3(); // create once and reuse it!
+             camera.getWorldDirection( vector );
+            // console.log(vector);
+            //vector.angleTo( this.mesh.rotation );
+             vector.x = 0;
+             vector.z = 0;
+           
+            // let rotObjectMatrix = new THREE.Matrix4();
+            // rotObjectMatrix.makeRotationFromQuaternion(camera.quaternion);
+            this.mesh.quaternion.setFromAxisAngle(vector, 10);
+            //console.log(this.mesh.quaternion);
+
+            //https://stackoverflow.com/questions/29626721/apply-an-objects-rotation-to-another-with-three-js
+            //gostei deste 
+            // let rotObjectMatrix = new THREE.Matrix4();
+            // rotObjectMatrix.makeRotationFromQuaternion(camera.quaternion);
+            // this.mesh.quaternion.setFromRotationMatrix(rotObjectMatrix);
+            //console.log(this.mesh.quaternion);
+
+
             //console.log(this.mesh.rotation.y + " -- " + camera.rotation.y);
                 //this.mesh.rotation.y =event.getObject().rotation.y*Math.PI;
                 //console.log("camera : "+camera.rotation.z);
