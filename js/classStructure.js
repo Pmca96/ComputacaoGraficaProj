@@ -4,7 +4,7 @@ import  Zone from './classZone.js';
 import  Player from './classPlayer.js';
 import {Fire}  from './libs/fire.js';
 import  {Land, Route} from './classLands.js';
-import  {Wolf} from './classBuildings.js';
+import  {Wolf, Buildings, Castle} from './classBuildings.js';
 class Obj extends THREE.Object3D{
     constructor(x,y,z){
         super();
@@ -37,22 +37,12 @@ class Ligth extends THREE.Object3D{
   class HemisphereLight extends Ligth{
     constructor(position){
       super(position);
-      this.light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.5);
+      this.light = new THREE.HemisphereLight( 0xffffff, 0xffffff, 0.8);
       this.light.position.set( position.x,position.y,position.z );
       this.light.groundColor.setHSL( 0.095, 1, 0.75 );
       this.light.color.setHSL( 0.6, 1, 0.6 );
     }
   }
-
-  class HemisphereLightHelper extends Ligth {
-    constructor( hemiLight, size = 10){
-        super();
-      this.light = new THREE.HemisphereLightHelper( hemiLight, size);
-    }
-  }
-
-
-
 
 export default class Application {
     constructor() {
@@ -61,12 +51,9 @@ export default class Application {
         this.objects = [];
         this.objectsNoUpdate = [];
         this.players = [];
-        this.prevTime = performance.now();
-        this.velocity = new THREE.Vector3();
-        this.velocity.x = 1;
-        this.velocity.z = 1;
+        this.wave=1;
         this.createScene();  
-
+        this.building = 1;
         //MAIN OBJECTS TO LOAD
         this.objs = [
             new HemisphereLight({x:50, y: 50, z:0}),
@@ -84,7 +71,7 @@ export default class Application {
 
         this.scene = new THREE.Scene();
 
-        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 75);
+        this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 1, 70);
         this.camera.position.z = 5;
 
         this.camera.position.x = 1 - 3 *  Math.sin( 0 );
@@ -97,13 +84,12 @@ export default class Application {
         this.renderer.domElement.id = 'canvas';
         this.renderer.shadowMap.enabled = true;
         this.renderer.setPixelRatio( window.devicePixelRatio );
-        //this.renderer.getMaxAnisotropy();
         this.raycaster = new THREE.Raycaster();
 
 
         
         // Add Light
-        this.light = new THREE.DirectionalLight( 0xffffff );
+        this.light = new THREE.DirectionalLight( 0xffffff, 0.7 );
         this.light.color.setHSL( 0.1, 1, 0.95 );
         this.light.position.multiplyScalar( 70 );
         this.light.position.set( 50, 50, 0 );
@@ -111,22 +97,17 @@ export default class Application {
 
 
 
-        this.light.castShadow = true;
-        let d = 10;
+        this.light.castShadow = false;
+        let d = 100;
         this.light.shadow.camera.left = - d;
         this.light.shadow.camera.right = d;
         this.light.shadow.camera.top = -d;
         this.light.shadow.camera.bottom =  d;
 
 
-        this.light.shadow.mapSize.width = 2048;
-        this.light.shadow.mapSize.height = 2048;
+        this.light.shadow.mapSize.width = 128;
+        this.light.shadow.mapSize.height = 128;
 
-        this.light.shadow.camera.far = 50;
-        this.light.shadow.camera.near = 0.5;
-        // this.light.shadow.bias = - 0.0001;
-        this.light.matrixAutoUpdate  = true;
-        this.light.shadow.matrixAutoUpdate  = true;
 
         //Add Floor To the Scene HERE-------------------
         this.floorTexture = new THREE.TextureLoader().load("images/grass.png");
@@ -139,7 +120,6 @@ export default class Application {
         this.floor.rotation.x = - Math.PI / 2;
         this.floor.receiveShadow = true;
         this.scene.add(this.floor);
-        
         
         this.controls = new THREE.PointerLockControls( this.camera, document.body );
         this.scene.add( this.controls.getObject() );
@@ -229,30 +209,22 @@ export default class Application {
 
         this.delta = this.clock.getDelta();
         this.objects.forEach((object) => {
-            if(object instanceof Turret)
-              object.update();
-            else if (object instanceof Wolf)
-                if (object.mixer)
+            if (object instanceof Wolf)
+                if (object.mixer) 
                     object.mixer.update(this.delta);
+            else
+                object.update();
           });
         
         if ( typeof this.MainPlayer.mesh != "undefined" && typeof this.MainPlayer.mixer != "undefined"  ){
             if (this.MainPlayer != "")
-            this.MainPlayer.updateCameraPosition(this.camera, this.light, this.controls);
+            this.MainPlayer.updateCameraPosition(this.camera, this.light);
             this.MainPlayer.checkKeyStates();
             this.players.map( i => {
                 if (i.mixer)
                 i.mixer.update(this.delta);
             });
        
-        }
-
-        if ( this.controls.isLocked === true ) {
-            this.raycaster.ray.origin.copy( this.controls.getObject().position );
-            this.velocity.x -= this.velocity.x ;
-            this.velocity.z -= this.velocity.z ;
-            this.controls.moveRight( - this.velocity.x  );
-            this.controls.moveForward( - this.velocity.z  );
         }
 
         this.renderer.render( this.scene , this.camera );
@@ -313,36 +285,6 @@ export default class Application {
     onMouseClick(event){
         this.add(this.objs);
         this.controls.lock();
-        // let element = document.body;
-        // if (document.fullscreenElement) {
-        //     document.exitFullscreen(); 
-            
-        //     document.getElementById('canvas').style.cursor = "block";
-        // } else {
-        //     element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-        //     if ( /Firefox/i.test( navigator.userAgent ) ) {
-        //         var fullscreenchange = function ( event ) {
-        //             if ( document.fullscreenElement === element || document.mozFullscreenElement === element || document.mozFullScreenElement === element ) {
-        //                 document.removeEventListener( 'fullscreenchange', fullscreenchange );
-        //                 document.removeEventListener( 'mozfullscreenchange', fullscreenchange );
-        //                 element.requestPointerLock();
-        //             }
-        //         };
-        //         document.addEventListener( 'fullscreenchange', fullscreenchange, false );
-        //         document.addEventListener( 'mozfullscreenchange', fullscreenchange, false );
-        //         element.requestFullscreen = element.requestFullscreen || element.mozRequestFullscreen || element.mozRequestFullScreen || element.webkitRequestFullscreen;
-        //         element.requestFullscreen();
-        //     } else {
-        //         element.requestPointerLock();
-        //     }
-        //     document.getElementById('canvas').style.cursor = "none";
-        // }
-
-
-        // canvas = document.createElement("CANVAS"); 
-        // canvas.requestPointerLock = canvas.requestPointerLock || canvas.mozRequestPointerLock;
-        // canvas.requestPointerLock(true);
-        // console.log(canvas);
     }
 
     onMouseDown(){
@@ -358,7 +300,22 @@ export default class Application {
     }
 
     onKeyDown( event ){
-        this.MainPlayer.keyState[event.keyCode || event.which] = true;
+        
+        if (event.keyCode == 84) { //T
+            if (this.building == 1) {
+                for(var index in this.objects) {
+                    if (this.objects[index] instanceof Buildings && !this.objects[index] instanceof Castle )
+                        this.objects[index].mesh.visible = false;
+                }
+            } else
+                this.light.castShadow = true;
+        } else if (event.keyCode == 89) { //Y
+            if (this.light.castShadow == true)
+                this.light.castShadow = false;
+            else
+                this.light.castShadow = true;
+        } else
+            this.MainPlayer.keyState[event.keyCode || event.which] = true;
     }
 
     onKeyUp( event ){
@@ -374,7 +331,6 @@ export default class Application {
     }
 
     onMouseMove (event) {
-        //this.MainPlayer.updateCameraPosition(this.camera, this.light, event);
     }
 
     calculateIntersects( event ){

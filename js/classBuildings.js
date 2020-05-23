@@ -328,7 +328,6 @@ function loadMesh1(path, textureM, objectClass, fn) {
                 }
             }
         });
-    
   
         objectClass.mesh.position.x = objectClass.position.x;
         objectClass.mesh.position.y = objectClass.position.y;
@@ -341,6 +340,7 @@ function loadMesh1(path, textureM, objectClass, fn) {
             objectClass.clip = [];
             objectClass.animations = gltf.animations;
             objectClass.mixer = new THREE.AnimationMixer( objectClass.mesh );
+          
             objectClass.animations.map((v,i) => {
                 objectClass.clip[i] = objectClass.mixer.clipAction(v);
             })
@@ -351,4 +351,4 @@ function loadMesh1(path, textureM, objectClass, fn) {
 }
 
 
-export { Castle,Market,MedievalHouse, SkyTower ,Houses, Toilet, FantasyHouses,LittlePolly,Wolf};
+export { Castle,Market,MedievalHouse, SkyTower ,Houses, Toilet, FantasyHouses,LittlePolly,Wolf, Buildings};

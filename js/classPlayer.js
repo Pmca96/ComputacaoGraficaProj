@@ -18,20 +18,21 @@ export default class Player extends THREE.Object3D {
         this.keyState = {};
         this.clip = [];
         this.lookingAtZ = 0;
-        this.text = 0;
+        this.lives = 20;
+        this.money = 200;
     }
 
     createPlayer(scene,camera, light){
-        
-           
-        loadMesh(scene, this, function (fn) {
-            if (fn.position.x == -55)
-                fn.rotation.y = Math.PI;
-            fn.updateCameraPosition(camera, light, 1);
-            if (fn.position.x == -55)
+
+            loadMesh(scene, this, function (fn) {
+            fn.updateCameraPosition(camera, light);
+
+            if (fn.x == -55) {
+                fn.mesh.rotation.y = Math.PI/2;
                 camera.lookAt(fn.position.x + 10 , fn.position.y, fn.position.z +2 );
-            else
+            } else
                 camera.lookAt(fn.position.x - 10 , fn.position.y, fn.position.z +2 );
+                
         });
     };
 
@@ -39,82 +40,10 @@ export default class Player extends THREE.Object3D {
         return this.mesh;
     }
      
-    updateCameraPosition(camera, light, event){
-
+    updateCameraPosition(camera){
         camera.position.x = this.mesh.position.x - 0 *  Math.sin( this.mesh.rotation.y );
         camera.position.y = this.mesh.position.y + 1 ;
         camera.position.z = this.mesh.position.z - 0 * Math.cos( this.mesh.rotation.y );
-        if (event != null ) {
-            //https://stackoverflow.com/questions/14813902/three-js-get-the-direction-in-which-the-camera-is-looking
-             let vector = new THREE.Vector3(); // create once and reuse it!
-             camera.getWorldDirection( vector );
-            // console.log(vector);
-            //vector.angleTo( this.mesh.rotation );
-             vector.x = 0;
-             vector.z = 0;
-           
-            // let rotObjectMatrix = new THREE.Matrix4();
-            // rotObjectMatrix.makeRotationFromQuaternion(camera.quaternion);
-            this.mesh.quaternion.setFromAxisAngle(vector, 10);
-            //console.log(this.mesh.quaternion);
-
-            //https://stackoverflow.com/questions/29626721/apply-an-objects-rotation-to-another-with-three-js
-            //gostei deste 
-            // let rotObjectMatrix = new THREE.Matrix4();
-            // rotObjectMatrix.makeRotationFromQuaternion(camera.quaternion);
-            // this.mesh.quaternion.setFromRotationMatrix(rotObjectMatrix);
-            //console.log(this.mesh.quaternion);
-
-
-            //console.log(this.mesh.rotation.y + " -- " + camera.rotation.y);
-                //this.mesh.rotation.y =event.getObject().rotation.y*Math.PI;
-                //console.log("camera : "+camera.rotation.z);
-                //console.log(this.mesh.rotation);
-                   
-                //this.mesh.rotation.y = camera.rotation.y;
-                //this.mesh.lookAt(camera.getWorldDirection() );
-                //console.log(camera.rotation)
-                // console.log(event.getObject().rotation );
-            // console.log(this.mesh.rotation );
-            // let target =  new THREE.Vector3( );
-            // target.copy( this.mesh.position ).add( camera.getWorldDirection(target));
-            
-            // this.mesh.lookAt( target );
-        }
-        //this.playerData();
-        // } else {
-        //     let mouse = new THREE.Vector2();
-        //     let target = new THREE.Vector2();
-        //     let windowHalf = new THREE.Vector2( window.innerWidth / 2, window.innerHeight / 2 );
-        //     mouse.x = ( event.clientX - windowHalf.x );
-        //     mouse.y = ( event.clientY - windowHalf.y );
-
-        //     target.x = ( 1 - mouse.x ) * 0.002;
-
-        //     this.lookingAtY= ( 1 - mouse.y ) * 0.002;
-        //     if (typeof this.mesh != "undefined") {
-        //         camera.lookAt( new THREE.Vector3(this.mesh.position.x,this.mesh.position.y+0.8+this.lookingAtY,this.mesh.position.z));
-        //         this.mesh.rotation.y += 0.05 * ( target.x - this.mesh.rotation.y );
-            
-        //         camera.rotation.y += 0.05 * ( target.x - camera.rotation.y );
-        //     }
-        // }
-        let d = 10;
-        // if (!(this.mesh.position.x > 10 || this.mesh.position.x < -10 || this.mesh.position.z > 10 || this.mesh.position.z < -10)) {
-        //     console.log(light.shadow.camera);
-        //     console.log(light.shadow.camera.left + " = " +( this.mesh.position.x - d));
-        // }
-
-        light.shadow.camera.left = this.mesh.position.x - d;
-        light.shadow.camera.right =  this.mesh.position.x  + d;
-        light.shadow.camera.top =  this.mesh.position.z - d;
-        light.shadow.camera.bottom = this.mesh.position.z+ d;
-
-        // if (!(this.mesh.position.x > 10 || this.mesh.position.x < -10 || this.mesh.position.z > 10 || this.mesh.position.z < -10)) {
-        //     console.log(light.shadow.camera);
-        //     console.log(light.shadow.camera.left + " = " +( this.mesh.position.x - d));
-        // }
-
     };
     
     updatePlayerPosition(data){
@@ -141,26 +70,18 @@ export default class Player extends THREE.Object3D {
             this.mesh.position.x -= this.moveSpeed * Math.sin(this.mesh.rotation.y);
             this.mesh.position.z -= this.moveSpeed * Math.cos(this.mesh.rotation.y);
     
-            this.clip[18].play();
             this.playerData();
         } else if (this.keyState[37] || this.keyState[65]) {
             // left arrow or 'a' - strage right
             
             this.mesh.position.x += this.moveSpeed/2 * Math.cos(this.mesh.rotation.y);
             this.mesh.position.z -= this.moveSpeed/2 * Math.sin(this.mesh.rotation.y);
-            // console.log(this.mixer.getRoot());
-            // console.log(this.clip[10]);
-           
-            //this.mixer.uncacheAction(this.clip[10]);
             this.playerData();
         } else if (this.keyState[39] || this.keyState[68]) {
             // right arrow or 'd' - strafe left
             this.mesh.position.x -= this.moveSpeed/2 * Math.cos(this.mesh.rotation.y);
             this.mesh.position.z += this.moveSpeed/2 * Math.sin(this.mesh.rotation.y);
-            //this.mixer.uncacheAction(clip[0]);
-            // this.clip[0].setLoop( THREE.LoopOnce );
-            // this.clip[0].play();
-            
+    
             this.playerData();
         }else if (this.keyState[81]) {
             // 'q' - rotate left
@@ -202,7 +123,6 @@ function loadMesh(scene, player, fn) {
     let xValue = player.x;
     let yValue = player.y;
     let zValue = player.z;
-    
     loader.load( 'male_adventurer/scene.gltf', function ( gltf ) {
         player.mesh = gltf.scene;
         player.mesh.rotation.set(0,5,0);
