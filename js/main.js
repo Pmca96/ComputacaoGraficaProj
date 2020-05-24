@@ -36,3 +36,32 @@ socket.on('removeOtherPlayer', function(data){
     app.remove(data.playerId);
 });
 
+document.addEventListener("click",handler,true);
+var stopEventClick = true;
+
+function startTimer(duration) {
+    var timer = duration;
+    let interval = setInterval(function () {
+
+        --timer;
+        if (timer == 0) {
+            clearInterval(interval) ;
+            stopEventClick = false;
+            document.getElementById("timer").innerHTML = "Click to play";
+        }
+    }, 1000);
+}
+
+window.onload = function () {
+    var time = 6;
+    startTimer(time);
+};
+
+
+
+function handler(e){
+    if (stopEventClick) {
+        e.stopPropagation();
+        e.preventDefault();
+    }
+}
