@@ -20,6 +20,11 @@ socket.on('createPlayer', function(data){
     let mainPlayer = new Player(data);
     app.add(mainPlayer);
     app.setMainPlayer(mainPlayer);
+
+    document.getElementById("wave").innerHTML= 1;
+    document.getElementById("health").innerHTML= mainPlayer.lives;
+    document.getElementById("money").innerHTML= mainPlayer.money;
+    
     
 });
 socket.on('addOtherPlayer', function(data){

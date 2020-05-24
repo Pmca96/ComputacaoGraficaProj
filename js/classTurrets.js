@@ -22,6 +22,7 @@ class Turret extends THREE.Object3D {
         group.add(this.createHammer2(0, 0.6, 0));
 
         group.position.set(position.x, position.y, position.z);
+
         this.mesh = group;
         this.mesh.receiveShadow = true;
     }
@@ -127,6 +128,8 @@ class Turret1 extends Turret {
         group.add(this.createFire(0,5, 0));
 
         group.position.set(position.x, position.y, position.z);
+        group.receiveShadow = true;    
+        group.castShadow = true;
         this.mesh = group;
         this.mesh.receiveShadow = true;
     }
@@ -303,6 +306,8 @@ class Turret2 extends Turret {
         group.add(this.createWater(0, 1.75, 0));
         group.add(this.createCannon(0, 2.65, 0));
         group.position.set(position.x, position.y, position.z);
+        group.receiveShadow = true;    
+        group.castShadow = true;
         this.mesh = group;
         this.mesh.receiveShadow = true;
     }

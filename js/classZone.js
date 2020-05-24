@@ -1,7 +1,7 @@
 
 import { TurretFree, Turret1,Turret2  } from './classTurrets.js';
 import {Castle,Market,MedievalHouse, SkyTower, Toilet,Houses,FantasyHouses, LittlePolly, Wolf} from './classBuildings.js';
-import {Labyrinth} from './classLands.js';
+import {Labyrinth, pathWall} from './classLands.js';
 export default class Zone {
     constructor( data , inv = 1){
         this.x = data.x;
@@ -21,6 +21,9 @@ export default class Zone {
 
         this.createBuildings();
         this.createTurrets();  
+
+        let labWall = new pathWall({x : 0, y : 0, z : 0}, this.inv);
+        this.objects.push(labWall);
 
         //Temporary
         let Wolf1 = new Wolf({x : -7*this.inv, y : -0.7, z : 80*this.inv}, {y : Math.PI / 2},  this.inv);
@@ -56,10 +59,10 @@ export default class Zone {
         let wc = new Toilet({x : -55*this.inv, y : -0.7, z : 20*this.inv},  this.inv);
         this.objects.push(castle, market, wc);
         
-        // let MHouse1 = new FantasyHouses({x : -50*this.inv, y : -0.7, z : 80*this.inv}, {y : Math.PI / 2},  this.inv);
-        // let MHouse2 = new FantasyHouses({x : -88*this.inv, y : -0.7, z : -34*this.inv}, {y : Math.PI / 2},  this.inv);
-        // let MHouse3 = new FantasyHouses({x : -88*this.inv, y : -0.7, z : 49*this.inv}, {y : Math.PI / 2},  this.inv);
-        // this.objects.push(MHouse1, MHouse2,MHouse3);
+        let MHouse1 = new FantasyHouses({x : -50*this.inv, y : -0.7, z : 80*this.inv}, {y : Math.PI / 2},  this.inv);
+        let MHouse2 = new FantasyHouses({x : -88*this.inv, y : -0.7, z : -34*this.inv}, {y : Math.PI / 2},  this.inv);
+        let MHouse3 = new FantasyHouses({x : -88*this.inv, y : -0.7, z : 49*this.inv}, {y : Math.PI / 2},  this.inv);
+        this.objects.push(MHouse1, MHouse2,MHouse3);
 
         let MedievalHouse1 = new MedievalHouse({x : -80*this.inv, y : -0.7, z : 80*this.inv}, {y : -Math.PI / 3+Math.PI},  this.inv);
         let MedievalHouse2 = new MedievalHouse({x : -80*this.inv, y : -0.7, z : -80*this.inv}, {y : Math.PI / 3 },  this.inv);

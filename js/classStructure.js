@@ -105,8 +105,8 @@ export default class Application {
         this.light.shadow.camera.bottom =  d;
 
 
-        this.light.shadow.mapSize.width = 128;
-        this.light.shadow.mapSize.height = 128;
+        this.light.shadow.mapSize.width = 1024;
+        this.light.shadow.mapSize.height = 1024;
 
 
         //Add Floor To the Scene HERE-------------------
@@ -209,10 +209,10 @@ export default class Application {
 
         this.delta = this.clock.getDelta();
         this.objects.forEach((object) => {
-            if (object instanceof Wolf)
+            if (object instanceof Wolf) {
                 if (object.mixer) 
                     object.mixer.update(this.delta);
-            else
+            } else if (object instanceof Buildings || object instanceof Turret)
                 object.update();
           });
         
@@ -248,10 +248,7 @@ export default class Application {
                     this.scene.add( mesh[index].getLight() );
                 } else if (mesh[index] instanceof Zone) {
                     mesh[index].objects.map ((i) => {
-                        if (i instanceof Turret || i instanceof Wolf )
                             this.objects.push(i);
-                        else
-                            this.objectsNoUpdate.push(i);
                         this.scene.add(i.getMesh() );
                     });
                 }
@@ -268,10 +265,7 @@ export default class Application {
                 this.scene.add( mesh.getLight() );
             } else if (mesh instanceof Zone) {
                 mesh.objectsNoUpdate.map ((i) => {
-                    if (i instanceof Turret)
                         this.objects.push(i);
-                    else
-                        this.objectsNoUpdate.push(i);
                     this.scene.add(i.getMesh() );
                 });
             }
@@ -303,12 +297,16 @@ export default class Application {
         
         if (event.keyCode == 84) { //T
             if (this.building == 1) {
-                for(var index in this.objects) {
-                    if (this.objects[index] instanceof Buildings && !this.objects[index] instanceof Castle )
+                for(var index in this.objects) 
+                    if (this.objects[index] instanceof Buildings && this.objects[index] instanceof Castle == false ) 
                         this.objects[index].mesh.visible = false;
-                }
-            } else
-                this.light.castShadow = true;
+                this.building = false;
+            } else {
+                for(var index in this.objects) 
+                    if (this.objects[index] instanceof Buildings && this.objects[index] instanceof Castle == false ) 
+                        this.objects[index].mesh.visible = true;
+                this.building = true;  
+            } 
         } else if (event.keyCode == 89) { //Y
             if (this.light.castShadow == true)
                 this.light.castShadow = false;

@@ -46,178 +46,50 @@ class Labyrinth extends Land {
     createLabyrinth(x, y, z, inv) {
 
         var group = new THREE.Group();
-        group.add(this.fbPath0(-15*inv, -0.5, 0));
-        group.add(this.fbPath1(-31.5*inv, -0.5, 40*inv));
-        group.add(this.fbPath2(-36.5*inv, -0.5, 12*inv));
-        group.add(this.fbPath3(-28*inv, -0.5, 0));
-        group.add(this.fbPath2(-19.5*inv, -0.5, -14*inv));
-        group.add(this.fbPath4(-28*inv, -0.5, -46*inv));
-        group.add(this.fbPath2(-40.5*inv, -0.5, -26*inv));
-        group.add(this.fbPath5(-52*inv, -0.5, -1*inv));
-        group.add(this.lrPath0(-20.5*inv, -0.5, 20*inv));
-        group.add(this.lrPath1(-42.5*inv, -0.5, 24*inv));
-        group.add(this.lrPath2(-30.5*inv, -0.5, 8*inv));
-        group.add(this.lrPath3(-25.5*inv, -0.5, -9*inv));
-        group.add(this.lrPath1(-17.5*inv, -0.5, -30*inv));
-        group.add(this.lrPath4(-38.5*inv, -0.5, -36*inv));
-        group.add(this.lrPath5(-46.5*inv, -0.5, -13.5*inv));
+        group.add(this.fbPath(-15*inv, -0.5, 0,  [15, 0.01, 4]));
+        group.add(this.fbPath(-31.5*inv, -0.5, 40*inv, [26, 0.01, 4]));
+        group.add(this.fbPath(-36.5*inv, -0.5, 12*inv, [8, 0.01, 4]));
+        group.add(this.fbPath(-28*inv, -0.5, 0, [9, 0.01, 4]));
+        group.add(this.fbPath(-19.5*inv, -0.5, -14*inv, [8, 0.01, 4]));
+        group.add(this.fbPath(-28*inv, -0.5, -46*inv, [25, 0.01, 4]));
+        group.add(this.fbPath(-40.5*inv, -0.5, -26*inv, [8, 0.01, 4]));
+        group.add(this.fbPath(-52*inv, -0.5, -1*inv, [7, 0.01, 4]));
+        group.add(this.lrPath(-20.5*inv, -0.5, 20*inv, [4, 0.01, 36]));
+        group.add(this.lrPath(-42.5*inv, -0.5, 24*inv, [4, 0.01, 28]));
+        group.add(this.lrPath(-30.5*inv, -0.5, 8*inv, [4, 0.01, 12]));
+        group.add(this.lrPath(-25.5*inv, -0.5, -9*inv, [4, 0.01, 14]));
+        group.add(this.lrPath(-17.5*inv, -0.5, -30*inv, [4, 0.01, 28]));
+        group.add(this.lrPath(-38.5*inv, -0.5, -36*inv, [4, 0.01, 16]));
+        group.add(this.lrPath(-46.5*inv, -0.5, -13.5*inv, [4, 0.01, 29]));
         group.position.set(x, y, z, inv);
         this.mesh = group;
     }
 
-    fbPath0(x, y, z) {
+    fbPath(x, y, z, size) {
 
-        var pathGeometry = new THREE.CubeGeometry(15, 0.01, 4);
+        var pathGeometry = new THREE.CubeGeometry(size[0], size[1], size[2]);
         var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
         pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
         pathTexture.offset.set( 0, 0 );
-        pathTexture.repeat.set( 7.5, 2 );
+        pathTexture.repeat.set( (size[0] + size[2])/2, 2 );
         var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
         var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
         pathCube.position.set(x, y, z);
+        pathCube.receiveShadow = true;    
         return pathCube;
     }
 
-    fbPath1(x, y, z) {
+    lrPath(x, y, z,size) {
 
-        var pathGeometry = new THREE.CubeGeometry(26, 0.01, 4);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0 );
-        pathTexture.repeat.set( 13, 2 );
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    fbPath2(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(8, 0.01, 4);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0 );
-        pathTexture.repeat.set( 6, 2 );
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    fbPath3(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(9, 0.01, 4);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0 );
-        pathTexture.repeat.set( 4.5, 2 );
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    fbPath4(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(25, 0.01, 4);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0 );
-        pathTexture.repeat.set( 10, 2 );
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    fbPath5(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(7, 0.01, 4);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0 );
-        pathTexture.repeat.set( 5, 2 );
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    lrPath0(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(4, 0.01, 36);
+        var pathGeometry = new THREE.CubeGeometry(size[0], size[1], size[2]);
         var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
         pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
         pathTexture.offset.set( 0, 0);
-        pathTexture.repeat.set( 2, 12);
+        pathTexture.repeat.set( 2,(size[0] + size[2])/2 );
         var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
         var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
         pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    lrPath1(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(4, 0.01, 28);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0);
-        pathTexture.repeat.set( 2, 14);
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    lrPath2(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(4, 0.01, 12);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0);
-        pathTexture.repeat.set( 2, 6);
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    lrPath3(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(4, 0.01, 14);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0);
-        pathTexture.repeat.set( 2.5, 9);
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    lrPath4(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(4, 0.01, 16);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0);
-        pathTexture.repeat.set( 2, 12);
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
-        return pathCube;
-    }
-
-    lrPath5(x, y, z) {
-
-        var pathGeometry = new THREE.CubeGeometry(4, 0.01, 29);
-        var pathTexture = new THREE.TextureLoader().load("images/rode1.jpg");
-        pathTexture.wrapS = pathTexture.wrapT = THREE.RepeatWrapping;
-        pathTexture.offset.set( 0, 0);
-        pathTexture.repeat.set( 2, 12);
-        var pathMaterial = new THREE.MeshPhongMaterial( { map: pathTexture, side: THREE.DoubleSide });
-        var pathCube = new THREE.Mesh( pathGeometry, pathMaterial );
-        pathCube.position.set(x, y, z);
+        pathCube.receiveShadow = true;    
         return pathCube;
     }
 
@@ -227,4 +99,115 @@ class Labyrinth extends Land {
 }
 
 
-export { Labyrinth, Land , Route };
+class pathWall extends Land {
+    constructor(position, inversion) {
+        super();
+        this.createPathWall(position.x, position.y, position.z, inversion)
+    }
+
+    createPathWall(x, y, z, inv) {
+
+        var group = new THREE.Group();
+        //grouo add - methods
+        group.add(this.wallCorner(-11, 0, -2.75*inv));
+        group.add(this.wallCorner(11, 0, -2.75*inv));
+        group.add(this.wall(-17*inv, 0, -2.75*inv, [12.5, 1.5, 0.3]));
+        group.add(this.wallCorner(-23*inv, 0, -2.75*inv));
+        group.add(this.wall(-14.5*inv, 0, 2.75*inv, [7, 1.5, 0.3]));
+        group.add(this.wallCorner(-18*inv, 0, 2.75*inv));
+        group.add(this.wall(-23*inv, 0, 13*inv,[0.3, 1.5, 49]));
+        group.add(this.wallCorner(-23*inv, 0, 37.5*inv));
+        group.add(this.wall(-18*inv, 0, 22.5*inv,[0.3, 1.5, 39.5]));
+        group.add(this.wallCorner(-18*inv, 0, 42.5*inv));
+        group.add(this.wall(-31.5*inv,0 , 42.5*inv, [26.5, 1.5, 0.3]));
+        group.add(this.wallCorner(-45*inv, 0, 42.5*inv));
+        group.add(this.wall(-31.5*inv,0 , 37.5*inv,[17, 1.5, 0.3]));
+        group.add(this.wallCorner(-40*inv, 0, 37.5*inv));
+        group.add(this.wall(-40*inv,0 , 26*inv, [0.3, 1.5, 23]));
+        group.add(this.wallCorner(-40*inv, 0, 14.5*inv));
+        group.add(this.wall(-45*inv,0 , 26*inv, [0.3, 1.5, 33]));
+        group.add(this.wallCorner(-45*inv, 0, 9.5*inv));
+        group.add(this.wall(-34*inv,0 , 14.5*inv, [11.5, 1.5, 0.3]));
+        group.add(this.wallCorner(-28*inv, 0, 14.5*inv));
+        group.add(this.wall(-39*inv,0 , 9.5*inv, [12, 1.5, 0.3]));
+        group.add(this.wallCorner(-33*inv, 0, 9.5*inv));
+        group.add(this.wall(-28*inv,0 , 8.5*inv,[0.3, 1.5, 12]));
+        group.add(this.wallCorner(-28*inv, 0, 2.5*inv));
+        group.add(this.wall(-33*inv,0 , 3.5*inv, [0.3, 1.5, 12]));
+        group.add(this.wallCorner(-33*inv, 0, -2.5*inv));
+        group.add(this.wall(-25.5*inv,0 , 2.5*inv, [5, 1.5, 0.3]));
+        group.add(this.wallCorner(-23*inv, 0, 2.5*inv));
+        group.add(this.wall(-30.5*inv,0 , -2.5*inv, [5, 1.5, 0.3]));
+        group.add(this.wallCorner(-28*inv, 0, -2.5*inv));
+        group.add(this.wall(-28*inv,0 , -9.5*inv, [0.3, 1.5, 14]));
+        group.add(this.wallCorner(-28*inv, 0, -16.5*inv));
+        group.add(this.wallCorner(-23*inv, 0, -11.5*inv));
+        group.add(this.wall(-24*inv,0 , -16.5*inv, [8, 1.5, 0.3]));
+        group.add(this.wallCorner(-20*inv, 0, -16.5*inv));
+        group.add(this.wall(-19*inv,0 , -11.5*inv , [8, 1.5, 0.3]));
+        group.add(this.wallCorner(-15*inv, 0, -11.5*inv));
+        group.add(this.wall(-20*inv,0 , -30*inv, [0.3, 1.5, 27]));
+        group.add(this.wallCorner(-20*inv, 0, -43.5*inv));
+        group.add(this.wall(-15*inv,0 , -30*inv, [0.3, 1.5, 37]));
+        group.add(this.wallCorner(-15*inv, 0, -48.5*inv));
+        group.add(this.wall(-28*inv,0 , -43.5*inv, [16, 1.5, 0.3]));
+        group.add(this.wallCorner(-36*inv, 0, -43.5*inv));
+        group.add(this.wall(-28*inv,0 , -48.5*inv, [26, 1.5, 0.3]));
+        group.add(this.wallCorner(-41*inv, 0, -48.5*inv));
+        group.add(this.wall(-36*inv,0 , -33.5*inv, [0.3, 1.5, 20]));
+        group.add(this.wallCorner(-36*inv, 0, -23.5*inv));
+        group.add(this.wall(-41*inv,0 , -38.5*inv, [0.3, 1.5, 20]));
+        group.add(this.wallCorner(-41*inv, 0, -28.5*inv));
+        group.add(this.wall(-40*inv,0 , -23.5*inv,[8, 1.5, 0.3])); 
+        group.add(this.wallCorner(-44*inv, 0, -23.5*inv));
+        group.add(this.wall(-45*inv,0 , -28.5*inv,[8, 1.5, 0.3]));
+        group.add(this.wallCorner(-49*inv, 0, -28.5*inv));
+        group.add(this.wall(-44*inv,0 , -11*inv, [0.3, 1.5, 25]));
+        group.add(this.wallCorner(-44*inv, 0, 1.5*inv));
+        group.add(this.wall(-49*inv,0 , -16*inv , [0.3, 1.5, 25]));
+        group.add(this.wallCorner(-49*inv, 0, -3.5*inv));
+        group.add(this.wall(-49.5*inv,0 , 1.5*inv, [10.5, 1.5, 0.3]));
+        group.add(this.wallCorner(-54.5*inv, 0, 1.5*inv));
+        group.add(this.wall(-52*inv,0 , -3.5*inv, [5.5, 1.5, 0.3]));
+        group.add(this.wallCorner(-54.5*inv, 0, -3.5*inv));
+        group.position.set(x, y, z, inv);
+        this.mesh = group;
+    }
+
+    wallCorner(x, y, z ) {
+
+        var wallGeometry = new THREE.CubeGeometry(0.5, 2, 0.5);
+        var wallTexture = new THREE.TextureLoader().load("images/stonewall2.jpg");
+        wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+        wallTexture.offset.set( 0, 0 );
+        wallTexture.repeat.set( 1, 2 );
+        var wallMaterial = new THREE.MeshPhongMaterial( { map: wallTexture, side: THREE.DoubleSide });
+        var wallCube = new THREE.Mesh( wallGeometry, wallMaterial );
+        wallCube.position.set(x, y, z);
+        wallCube.receiveShadow = true;    
+        wallCube.castShadow = true;
+        return wallCube;
+    }
+
+    wall(x, y, z, size) {
+
+        var wallGeometry = new THREE.CubeGeometry(size[0], size[1], size[2]);
+        var wallTexture = new THREE.TextureLoader().load("images/stonewall2.jpg");
+        wallTexture.wrapS = wallTexture.wrapT = THREE.RepeatWrapping;
+        wallTexture.offset.set( 0, 0 );
+        wallTexture.repeat.set( (size[0]+size[2])/1, 2.5 );
+        var wallMaterial = new THREE.MeshPhongMaterial( { map: wallTexture, side: THREE.DoubleSide });
+        var wallCube = new THREE.Mesh( wallGeometry, wallMaterial );
+        wallCube.position.set(x, y, z);
+        wallCube.receiveShadow = true;    
+        wallCube.castShadow = true;
+        return wallCube;
+    }
+
+
+    getMesh() {
+        return this.mesh;
+    }
+}
+
+export { Labyrinth, Land , Route , pathWall };

@@ -21,7 +21,7 @@
             position: absolute;
             width: 100%;
             height: 100%;
-            background-color: rgba(0,0,0);
+            background-color: rgba(0,0,0, 0.5);
         }
 
         #instructions {
@@ -52,11 +52,58 @@
 
             cursor: pointer;
         }
+
+        .status{
+            padding:2px;
+            background-color:rgba(0,0,0,0.5);
+            border-radius: 20px;
+            float:left;
+            width:100px;
+            margin: 10px 10px;
+        }
+
+        #StatusBar{
+            position: absolute;
+            right:0;
+            top:0;
+
+        }
+        .statusImg{
+            float:left;
+            background-color:transparent;
+        }
+        .textStatus{
+            padding-top:10px;
+            font-family: monospace;
+            color:white;
+            font-weight: bold;
+            width:55px;
+            margin-left:5px;
+            margin-right:5px;
+            text-align: right;
+            float:left;
+        }
     </style>
 </head>
 
 
 <body >
+    <div id ="StatusBar">
+        <div id="healthStatus" class="status">
+            <div class="statusImg"><img src="images/heart.png" width="32px" heigh="32px" /></div>
+            <div id="health" class="textStatus"></div>
+        </div>
+
+        <div id="moneyStatus" class="status">
+            <div class="statusImg"><img src="images/coin.png" width="32px" heigh="32px"/></div>
+            <div id="money" class="textStatus"></div>
+        </div>
+        
+        <div id="waveStatus" class="status">
+            <div class="statusImg"><img src="images/wave1.png" width="32px" heigh="32px"/></div>
+            <div id="wave" class="textStatus"></div>
+        </div>
+    </div> 
     <div id="blocker" style="display: block;">
 
         <div id="instructions" style="">

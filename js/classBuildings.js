@@ -320,6 +320,7 @@ function loadMesh1(path, textureM, objectClass, fn) {
         objectClass.mesh = gltf.scene;
         objectClass.mesh.rotation.y = objectClass.rotation.y;
         objectClass.mesh.castShadow = true;
+        objectClass.mesh.receiveShadow = true;
         objectClass.mesh.traverse( function ( child ) {
             if (child instanceof THREE.Mesh) {
                 child.castShadow = true;

@@ -28,8 +28,8 @@ function Player(){
     this.sizeX = 1;
     this.sizeY = 1;
     this.sizeZ = 1;
-    this.speed = 0.5;
-    this.turnSpeed = 0.1;
+    this.speed = 0.2;
+    this.turnSpeed = 0.02;
 }
 
 var addPlayer = function(id){
