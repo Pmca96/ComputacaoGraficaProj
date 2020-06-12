@@ -102,7 +102,7 @@ class Turret extends THREE.Object3D {
 
 
 class Turret1 extends Turret {
-    constructor(position) {
+    constructor(position, ghost = 0) {
         super();
         this.lvl = 1;
         this.attackDamadge = 10;
@@ -111,9 +111,11 @@ class Turret1 extends Turret {
         this.attackSpeed = 1;
         this.projectilSpeed = 2;
         this.y = position.y;
-
+        this.price=100;
+        this.lvlPrice=75;
         this.inv = 0.01;
-        this.createTower(position);
+        if (ghost == 0)
+            this.createTower(position);
     }
 
     createTower(position){
@@ -282,7 +284,7 @@ class Turret1 extends Turret {
 }
 
 class Turret2 extends Turret {
-    constructor(position) {
+    constructor(position, ghost = 0) {
         super();
         this.lvl = 1;
         this.attackDamadge = 5;
@@ -291,9 +293,12 @@ class Turret2 extends Turret {
         this.attackSpeed = 2;
         this.projectilSpeed = 3;
         this.y = position.y;
-
+        this.price=125;
+        this.lvlPrice=75;
         this.inv = 0.01;
-        this.createTower(position);
+
+        if (ghost == 0)
+            this.createTower(position);
     }
 
     createTower(position){
@@ -403,7 +408,7 @@ class Turret2 extends Turret {
 
     levelUp() {
         if (this.lvl == 1)
-         {
+        {
             let texture = new THREE.TextureLoader().load("images/stone-granite.png");
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
             texture.offset.set( 0, 0);
@@ -415,7 +420,7 @@ class Turret2 extends Turret {
             this.attackRange = 16;
             this.attackSpeed = 3;
             this.projectilSpeed = 3.5;
-         }
+        }
     }
 
     getMesh() {

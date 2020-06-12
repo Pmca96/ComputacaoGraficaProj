@@ -1,5 +1,6 @@
 // store all players
 var players = [];
+var zone = [] ;
 var wc1 = 0;
 var wc2 = 0;
 
@@ -48,9 +49,9 @@ var removePlayer = function(player){
         wc2 = 0;
     var index = players.indexOf(player);
 
-    if (index > -1) {
+    if (index > -1) 
         players.splice(index, 1);
-    }
+    
 };
 
 var updatePlayerData = function(data){
@@ -60,7 +61,6 @@ try {
     player.x = data.x;
 }
 catch(Exeception ) {
-    console.log("2")
     return 0;
 }
     player.y = data.y;
@@ -75,16 +75,47 @@ catch(Exeception ) {
 var playerForId = function(id){
 
     var player;
-    for (var i = 0; i < players.length; i++){
+    for (var i = 0; i < players.length; i++)
         if (players[i].playerId === id){
-
             player = players[i];
             break;
-
         }
-    }
+    
 
     return player;
+};
+
+
+class Zone {
+    constructor( data){
+        this.x = data.x;
+        this.y = data.y;
+        this.z = data.z;
+        this.inv = zone.length == 0 ? -1 : 1; 
+        
+        this.playerId = data.playerId;
+        this.wave = data.wave;
+        this.turret= data.turret;
+        this.turretUpgrades = data.turretUpgrades;
+    }
+
+    updateZoneData (data) {
+        this.playerId = data.playerId;
+        this.wave = data.wave;
+        this.turret = data.turret;
+        this.turretUpgrades = data.turretUpgrades;
+    }
+
+}
+
+var zoneForId = function(data, id){
+    var zone = -1;
+    for (var i = 0; i < data.length; i++)
+        if (data[i].playerId === id){
+            zone = data[i];
+            break;
+        }
+    return zone;
 };
 
 module.exports.players = players;
@@ -92,3 +123,6 @@ module.exports.addPlayer = addPlayer;
 module.exports.removePlayer = removePlayer;
 module.exports.updatePlayerData = updatePlayerData;
 module.exports.playerForId = playerForId;
+module.exports.zone = zone;
+module.exports.Zone = Zone;
+module.exports.zoneForId = zoneForId;

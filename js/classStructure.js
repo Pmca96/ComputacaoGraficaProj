@@ -55,10 +55,11 @@ export default class Application {
         this.createScene();  
         this.building = 1;
         //MAIN OBJECTS TO LOAD
+        this.zone = [new Zone({x : 1, y : 0, z : 1}), new Zone({x : 1, y : 0, z : 1}, -1)];
         this.objs = [
             new HemisphereLight({x:50, y: 50, z:0}),
-            new Zone({x : 1, y : 0, z : 1}),
-            new Zone({x : 1, y : 0, z : 1}, -1),
+            this.zone[0],
+            this.zone[1],
             new Route({x : 0, y : -0.5, z : 0}),
         ];
         
@@ -124,8 +125,6 @@ export default class Application {
         this.controls = new THREE.PointerLockControls( this.camera, document.body );
         this.scene.add( this.controls.getObject() );
 
-        // this.scene.fog = new THREE.Fog("0xFFFFFF", 10, 50);
-
         //Add SkyBox to the Scene HERE -----------------------
         this.scene.background = new THREE.CubeTextureLoader()
             .setPath( 'images/' )
@@ -183,8 +182,8 @@ export default class Application {
         document.addEventListener('mouseout', this.onMouseOut(), false);
         document.addEventListener('keydown', function(e) { Application.onKeyDown(e) }, false );
         document.addEventListener('keyup', function(e) { Application.onKeyUp(e) }, false );
-        window.addEventListener( 'resize', this.onWindowResize(), false );
-      
+        window.addEventListener( 'resize', function(e) { Application.onWindowResize(e) } );
+    
         //Final touches-----------------------------------
         container.appendChild( this.renderer.domElement );
         document.body.appendChild( container );
@@ -196,9 +195,6 @@ export default class Application {
 
     animate(){
         requestAnimationFrame(animate);
-        
-      
-                
         this.render();
     }
 
@@ -248,7 +244,7 @@ export default class Application {
                     this.scene.add( mesh[index].getLight() );
                 } else if (mesh[index] instanceof Zone) {
                     mesh[index].objects.map ((i) => {
-                            this.objects.push(i);
+                        this.objects.push(i);
                         this.scene.add(i.getMesh() );
                     });
                 }
@@ -265,7 +261,7 @@ export default class Application {
                 this.scene.add( mesh.getLight() );
             } else if (mesh instanceof Zone) {
                 mesh.objectsNoUpdate.map ((i) => {
-                        this.objects.push(i);
+                    this.objects.push(i);
                     this.scene.add(i.getMesh() );
                 });
             }
@@ -273,6 +269,7 @@ export default class Application {
     }
 
     remove(id) {
+        console.log(id);
         this.scene.remove( this.playerForId(id).mesh );
     }
 
@@ -320,17 +317,27 @@ export default class Application {
         this.MainPlayer.keyState[event.keyCode || event.which] = false;
     }
 
-    onWindowResize() {
+    onWindowResize(event) {
         this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize( window.innerWidth, window.innerHeight );
-        this.renderer.setPixelRatio( window.devicePixelRatio );
-        this.render();
     }
 
     onMouseMove (event) {
     }
 
+    updateZone(zone) {
+        let zoneIndex = this.zoneForId(zone.playerId);
+        this.zone[zoneIndex].updateZone(zone);
+    }
+
+    associateZone(zone) {
+        this.zone[zone.index].updateZone(zone);
+        console.log("Associate");
+        console.log(zone);
+        console.log(this.zone[zone.index]);
+    }
+// 
     calculateIntersects( event ){
 
         //Determine objects intersected by raycaster
@@ -349,7 +356,14 @@ export default class Application {
 
     setMainPlayer(player) {
         this.MainPlayer = player;
-       
+        this.zone.map((i) => {
+            if (typeof i.playerId === "undefined") {
+                
+                console.log("aaa");
+                i.associatePlayer(player.playerId);
+                return 0;
+            }
+        } );
     }
 
     playerForId (id){
@@ -361,6 +375,17 @@ export default class Application {
             }
         }
         return this.players[i];
+    };
+
+    zoneForId (id){
+        var index;
+        for (var i = 0; i < this.zone.length; i++)
+            if (this.zone[i].playerId == id){
+                index = i;
+                break;
+            }
+        
+        return i;
     };
 }
 

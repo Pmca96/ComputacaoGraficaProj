@@ -1,7 +1,7 @@
-
+import socket from './main.js';
 import { TurretFree, Turret1,Turret2  } from './classTurrets.js';
 import {Castle,Market,MedievalHouse, SkyTower, Toilet,Houses,FantasyHouses, LittlePolly, Wolf} from './classBuildings.js';
-import {Labyrinth, pathWall} from './classLands.js';
+import {Labyrinth} from './classLands.js';
 export default class Zone {
     constructor( data , inv = 1){
         this.x = data.x;
@@ -9,6 +9,11 @@ export default class Zone {
         this.z = data.z;
         this.inv = inv;  //INVERTER CENÁRIO
         this.objects = [];
+        this.turret = [0,0,0,0,0,0];
+        this.turretUpgrades = [0,0,0,0,0,0];
+        this.turretClass = new Array();
+        this.playerId;
+        this.wave=1;
         this.createZone(); 
     }
 
@@ -34,23 +39,13 @@ export default class Zone {
     }
 
     createTurrets (){
-        let turret = new TurretFree({x : -27*this.inv, y : -0.4, z :20 *this.inv});
-        this.objects.push(turret);
-        turret = new TurretFree({x : -38*this.inv, y : -0.4, z :-16 *this.inv});
-        this.objects.push(turret);
-
-        turret = new Turret2({x : -33*this.inv, y : -0.4, z :27 *this.inv});
-        turret.levelUp();
-        this.objects.push(turret);
-
-        turret = new Turret2({x : -28*this.inv, y : -0.4, z :-30 *this.inv});
-        this.objects.push(turret);
-        
-        turret = new Turret1({x : -36*this.inv, y : -0.4, z :6 *this.inv});
-        this.objects.push(turret);
-        turret = new Turret1({x : -48*this.inv, y : -0.4, z :-35 *this.inv});
-        turret.levelUp();
-        this.objects.push(turret);
+        this.turretClass.push(new TurretFree({x : -27*this.inv, y : -0.4, z :20 *this.inv}));
+        this.turretClass.push(new TurretFree({x : -38*this.inv, y : -0.4, z :-16 *this.inv}));
+        this.turretClass.push(new TurretFree({x : -33*this.inv, y : -0.4, z :27 *this.inv}));
+        this.turretClass.push(new TurretFree({x : -28*this.inv, y : -0.4, z :-30 *this.inv}));
+        this.turretClass.push(new TurretFree({x : -36*this.inv, y : -0.4, z :6 *this.inv}));
+        this.turretClass.push(new TurretFree({x : -48*this.inv, y : -0.4, z :-35 *this.inv}));
+        this.turretClass.map((i) =>  this.objects.push(i));
     }
 
     createBuildings(){
@@ -82,5 +77,32 @@ export default class Zone {
         let skyPillar = new SkyTower({x : -30*this.inv, y : 50, z : -30*this.inv},  this.inv);
         this.objects.push(skyPillar);
     }
+   
+    associatePlayer(playerId){
+        this.playerId = playerId;
+        let data = new Object();
+        data.playerId = playerId;
+        data.x = this.x;
+        data.y = this.y;
+        data.z = this.z;
+        data.inv = this.inv;
+        data.wave = this.wave;
+        data.turretUpgrades = this.turretUpgrades;
+        data.turret = this.turret;
+        socket.emit('associateZone', data);
+    }
+
+    updateZone(data){
+        this.playerId = data.playerId;
+        this.x = data.x;
+        this.z = data.z;
+        this.y = data.y;
+        this.inv = data.inv;
+        this.wave = data.wave;
+        this.turret = data.turret;
+        this.turretUpgrades = data.turretUpgrades;
+        turretClass.map((i) => turretClass[i].updateTurrets(turret[i], turretUpgrades[i]));
+    }
+
 
 }

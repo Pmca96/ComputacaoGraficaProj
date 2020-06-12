@@ -13,11 +13,15 @@ app.get('/', function(req, res){
 
 // Handle connection
 io.on('connection', function(socket){
-    console.log('a user connected');
-
+    console.log(world.players.length);
+    console.log("-------------------------------------------");
+    if (world.players.length >= 2) {
+        console.log("disconeccted")
+        socket.disconnect();
+    }
     var id = socket.id;
     world.addPlayer(id);
-
+   
     var player = world.playerForId(id);
     socket.emit('createPlayer', player);
 
@@ -29,7 +33,10 @@ io.on('connection', function(socket){
                 socket.emit('addOtherPlayer', world.players[i]);
             }
         }
+
+        world.zone.map((i) => socket.broadcast.emit('updateZone', i));
     });
+
     socket.on('updatePosition', function(data){
         if ( data.x === undefined)
             return 0;
@@ -37,11 +44,40 @@ io.on('connection', function(socket){
         
         socket.broadcast.emit('updatePosition', newData);
     });
+
     socket.on('disconnect', function(){
-        console.log('user disconnected');
         io.emit('removeOtherPlayer', player);
         world.removePlayer( player );
     });
+
+    //ZONE
+
+    socket.on('associateZone', function(data){
+        if (world.zoneForId(world.zone,data.playerId) == -1)
+            world.zone.push(new world.Zone(data));
+ 
+        console.log("Printing zones" );
+        world.zone.map((i) => console.log(i));
+        data.index = world.zone.indexOf(world.zone[world.zone.length-1]);
+        socket.broadcast.emit('associateZone', data);
+    });
+
+    socket.on('updateZone', function(data){
+        let zoneFinder = world.zoneForId(world.zone, data.playerId);
+        var newData =zoneFinder.updateZoneData(data);
+        socket.broadcast.emit('updateZone', newData);
+        
+    });
+
+    socket.on('removeZone', function(data){
+        let zoneFinder = world.zoneForId(world.zone, data.playerId);
+        const index = zone.indexOf(zoneFinder);
+        if (index > -1) 
+            world.zone.splice(index, 1);
+        socket.broadcast.emit('removeZone', data);
+    });
+
+    
 
 });
 
