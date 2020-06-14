@@ -11,7 +11,7 @@ export default class Zone {
         this.objects = [];
         this.turret = [0,0,0,0,0,0];
         this.turretUpgrades = [0,0,0,0,0,0];
-        this.turretClass = new Array();
+        this.turretClass = [];
         this.playerId;
         this.wave=1;
         this.createZone(); 
@@ -45,7 +45,6 @@ export default class Zone {
         this.turretClass.push(new TurretFree({x : -28*this.inv, y : -0.4, z :-30 *this.inv}));
         this.turretClass.push(new TurretFree({x : -36*this.inv, y : -0.4, z :6 *this.inv}));
         this.turretClass.push(new TurretFree({x : -48*this.inv, y : -0.4, z :-35 *this.inv}));
-        this.turretClass.map((i) =>  this.objects.push(i));
     }
 
     createBuildings(){
@@ -80,7 +79,7 @@ export default class Zone {
    
     associatePlayer(playerId){
         this.playerId = playerId;
-        let data = new Object();
+        let data = {};
         data.playerId = playerId;
         data.x = this.x;
         data.y = this.y;
@@ -93,15 +92,9 @@ export default class Zone {
     }
 
     updateZone(data){
-        this.playerId = data.playerId;
-        this.x = data.x;
-        this.z = data.z;
-        this.y = data.y;
-        this.inv = data.inv;
         this.wave = data.wave;
         this.turret = data.turret;
         this.turretUpgrades = data.turretUpgrades;
-        turretClass.map((i) => turretClass[i].updateTurrets(turret[i], turretUpgrades[i]));
     }
 
 

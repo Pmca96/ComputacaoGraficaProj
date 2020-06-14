@@ -13,8 +13,6 @@ app.get('/', function(req, res){
 
 // Handle connection
 io.on('connection', function(socket){
-    console.log(world.players.length);
-    console.log("-------------------------------------------");
     if (world.players.length >= 2) {
         console.log("disconeccted")
         socket.disconnect();
@@ -55,17 +53,16 @@ io.on('connection', function(socket){
     socket.on('associateZone', function(data){
         if (world.zoneForId(world.zone,data.playerId) == -1)
             world.zone.push(new world.Zone(data));
- 
-        console.log("Printing zones" );
-        world.zone.map((i) => console.log(i));
         data.index = world.zone.indexOf(world.zone[world.zone.length-1]);
         socket.broadcast.emit('associateZone', data);
     });
 
     socket.on('updateZone', function(data){
         let zoneFinder = world.zoneForId(world.zone, data.playerId);
-        var newData =zoneFinder.updateZoneData(data);
-        socket.broadcast.emit('updateZone', newData);
+        if (zoneFinder != -1) {
+            zoneFinder.updateZoneData(data);
+            socket.broadcast.emit('updateZone', data);
+        }
         
     });
 
@@ -83,7 +80,7 @@ io.on('connection', function(socket){
 
 // Handle environment changes
 var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
-var ip_address = process.env.OPENSHIFT_NODEJS_IP || '127.0.0.1';
+var ip_address = process.env.OPENSHIFT_NODEJS_IP || '0.0.0.0';
  
 http.listen(port, ip_address, function(){
     console.log( "Listening on " + ip_address + ", server_port " + port );

@@ -11,6 +11,11 @@ class Turret extends THREE.Object3D {
  class TurretFree extends Turret {
     constructor(position) {
         super();
+        
+        this.y= position.y;
+        this.x= position.x;
+        this.z = position.z;
+        this.uuid = "";
         this.createSpace(position);
     }
 
@@ -25,6 +30,7 @@ class Turret extends THREE.Object3D {
 
         this.mesh = group;
         this.mesh.receiveShadow = true;
+        this.uuid = this.mesh.uuid;
     }
 
     createCircle1(x,y,z) {
@@ -100,20 +106,20 @@ class Turret extends THREE.Object3D {
     }
 }
 
-
 class Turret1 extends Turret {
     constructor(position, ghost = 0) {
         super();
         this.lvl = 1;
         this.attackDamadge = 10;
-        this.attackAOEDamadge = 0.5;
         this.attackRange = 10;
         this.attackSpeed = 1;
         this.projectilSpeed = 2;
         this.y = position.y;
+        this.x= position.x;
+        this.z = position.z;
         this.price=100;
-        this.lvlPrice=75;
         this.inv = 0.01;
+        this.uuid="";
         if (ghost == 0)
             this.createTower(position);
     }
@@ -134,6 +140,7 @@ class Turret1 extends Turret {
         group.castShadow = true;
         this.mesh = group;
         this.mesh.receiveShadow = true;
+        this.uuid = this.mesh.uuid;
     }
 
     //Erva
@@ -246,7 +253,7 @@ class Turret1 extends Turret {
     levelUp() {
         if (this.lvl == 1)
          {
-             
+            this.lvl = 2;
             this.attackDamadge = 20;
             this.attackRange = 12;
             this.attackSpeed = 1.2;
@@ -258,6 +265,17 @@ class Turret1 extends Turret {
             this.mesh.children[2].material = new THREE.MeshStandardMaterial({map: texture});
             this.mesh.updateMatrix();
          }
+    }
+
+    getLevelUp() {
+        let data = [];
+        data.lvl = 2;
+        data.attackDamadge = 20;
+        data.attackRange = 12;
+        data.attackSpeed = 1.2;
+        data.projectilSpeed = 2;
+        data.price = 100;
+        return data;
     }
 
     getMesh() {
@@ -288,15 +306,15 @@ class Turret2 extends Turret {
         super();
         this.lvl = 1;
         this.attackDamadge = 5;
-        this.attackAOEDamadge = 0;
         this.attackRange = 12;
         this.attackSpeed = 2;
-        this.projectilSpeed = 3;
-        this.y = position.y;
+        this.projectilSpeed = 3;       
+        this.y= position.y;
+        this.x= position.x;
+        this.z = position.z;
         this.price=125;
-        this.lvlPrice=75;
         this.inv = 0.01;
-
+        this.uuid = "";
         if (ghost == 0)
             this.createTower(position);
     }
@@ -315,6 +333,7 @@ class Turret2 extends Turret {
         group.castShadow = true;
         this.mesh = group;
         this.mesh.receiveShadow = true;
+        this.uuid = this.mesh.uuid;
     }
 
     //Erva
@@ -421,6 +440,19 @@ class Turret2 extends Turret {
             this.attackSpeed = 3;
             this.projectilSpeed = 3.5;
         }
+    }
+
+    getLevelUp() {
+        let data = [];
+        data.lvl = 2;
+        data.attackDamadge = 10;
+        data.attackRange = 16;
+        data.attackSpeed = 3;
+        data.projectilSpeed = 3.5;
+        data.price = 75;
+
+        return data;
+       
     }
 
     getMesh() {

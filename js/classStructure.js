@@ -1,5 +1,5 @@
-
-import  {Turret} from './classTurrets.js';
+import socket from './main.js';
+import  {Turret, TurretFree, Turret1, Turret2} from './classTurrets.js';
 import  Zone from './classZone.js';
 import  Player from './classPlayer.js';
 import {Fire}  from './libs/fire.js';
@@ -55,6 +55,7 @@ export default class Application {
         this.createScene();  
         this.building = 1;
         //MAIN OBJECTS TO LOAD
+        this.turretExemple = [new Turret1(0,1), new Turret2(0,2)];
         this.zone = [new Zone({x : 1, y : 0, z : 1}), new Zone({x : 1, y : 0, z : 1}, -1)];
         this.objs = [
             new HemisphereLight({x:50, y: 50, z:0}),
@@ -62,8 +63,8 @@ export default class Application {
             this.zone[1],
             new Route({x : 0, y : -0.5, z : 0}),
         ];
-        
-      
+        this.selectedTower = -1;
+        this.flag = 0;
     }
 
     createScene() {
@@ -176,10 +177,6 @@ export default class Application {
         } );
 
         document.addEventListener('click', function(e) { Application.onMouseClick(e) }, false );
-        document.addEventListener('mousedown', this.onMouseDown(), false);
-        document.addEventListener('mouseup', this.onMouseUp(), false);
-        document.addEventListener('mousemove', function(e) { Application.onMouseMove(e) }, false);
-        document.addEventListener('mouseout', this.onMouseOut(), false);
         document.addEventListener('keydown', function(e) { Application.onKeyDown(e) }, false );
         document.addEventListener('keyup', function(e) { Application.onKeyUp(e) }, false );
         window.addEventListener( 'resize', function(e) { Application.onWindowResize(e) } );
@@ -220,9 +217,101 @@ export default class Application {
                 if (i.mixer)
                 i.mixer.update(this.delta);
             });
-       
+
+            let indexZone = this.zoneForId(this.MainPlayer.playerId);
+            let meshMainP =this.MainPlayer.mesh.position;
+            let foundInside = 0;
+            let towerDiv = document.getElementById( 'towerDiv' );
+            if (indexZone > -1 )
+            this.zone[indexZone].turretClass.map ( (i, indexT  ) => {
+                let distance = Math.sqrt(Math.pow(meshMainP.x-i.mesh.position.x,2) + Math.pow(meshMainP.y-i.mesh.position.y,2) + Math.pow(meshMainP.z-i.mesh.position.z,2));
+                if (distance < 3.5)  {
+                    foundInside = 1;
+     
+                    if (i instanceof TurretFree) {
+                        document.getElementById( 'towerOption2' ).style.display = 'none';
+                        document.getElementById( 'towerOption1' ).style.display = 'block';
+                        document.getElementById( 'tower1' ).style.display = 'block';
+                        document.getElementById( 'tower2' ).style.display = 'block';
+                        document.getElementById( 'towerInfo' ).style.display = 'none';
+                        document.getElementById( 'mainTitle' ).innerHTML = 'Tower';
+                        document.getElementById( 'title1' ).innerHTML = 'Fire';
+                        document.getElementById( 'title2' ).innerHTML = 'Water';
+                        document.getElementById( 'dmdg1' ).innerHTML = this.turretExemple[0].attackDamadge;
+                        document.getElementById( 'dmdg2' ).innerHTML = this.turretExemple[1].attackDamadge;
+                        document.getElementById( 'range1' ).innerHTML = this.turretExemple[0].attackRange;
+                        document.getElementById( 'range2' ).innerHTML = this.turretExemple[1].attackRange;
+                        document.getElementById( 'speed1' ).innerHTML = this.turretExemple[0].attackSpeed;
+                        document.getElementById( 'speed2' ).innerHTML = this.turretExemple[1].attackSpeed;
+                        document.getElementById( 'proj1' ).innerHTML = this.turretExemple[0].projectilSpeed;
+                        document.getElementById( 'proj2' ).innerHTML = this.turretExemple[1].projectilSpeed;
+                        document.getElementById( 'cost1' ).innerHTML = this.turretExemple[0].price;
+                        document.getElementById( 'cost2' ).innerHTML = this.turretExemple[1].price;
+                        document.getElementById( 'costText' ).innerHTML =  "Cost";
+                    }else if (i.lvl == 1) {
+                        document.getElementById( 'towerOption2' ).style.display = 'none';
+                        document.getElementById( 'towerOption1' ).style.display = 'block';
+                        document.getElementById( 'towerInfo' ).style.display = 'none';
+                        document.getElementById( 'tower1' ).style.display = 'block';
+                        document.getElementById( 'tower2' ).style.display = 'block';
+
+                        if (i instanceof Turret1) 
+                            document.getElementById( 'mainTitle' ).innerHTML = 'Fire';
+                        else if  (i instanceof Turret2) 
+                            document.getElementById( 'mainTitle' ).innerHTML = 'Water';
+                        let data = i.getLevelUp();
+         
+                        document.getElementById( 'title1' ).innerHTML = 'Level 1';
+                        document.getElementById( 'title2' ).innerHTML = 'Level 2';
+                        document.getElementById( 'dmdg1' ).innerHTML = i.attackDamadge;
+                        document.getElementById( 'dmdg2' ).innerHTML = data.attackDamadge;
+                        document.getElementById( 'range1' ).innerHTML = i.attackRange;
+                        document.getElementById( 'range2' ).innerHTML = data.attackRange;
+                        document.getElementById( 'speed1' ).innerHTML =  i.attackSpeed;
+                        document.getElementById( 'speed2' ).innerHTML =  data.attackSpeed;
+                        document.getElementById( 'proj1' ).innerHTML =  i.projectilSpeed;
+                        document.getElementById( 'proj2' ).innerHTML =  data.projectilSpeed;
+                        document.getElementById( 'cost1' ).innerHTML =  data.price;
+                        document.getElementById( 'cost2' ).innerHTML =  i.price;
+                        document.getElementById( 'costText' ).innerHTML =  "Sell";
+                        
+                    }else if (i.lvl == 2) {
+                        document.getElementById( 'towerOption2' ).style.display = 'block';
+                        document.getElementById( 'towerOption1' ).style.display = 'none';
+                        document.getElementById( 'towerInfo' ).style.display = 'block';
+                        document.getElementById( 'tower1' ).style.display = 'none';
+                        document.getElementById( 'tower2' ).style.display = 'none';
+
+
+                        if (i instanceof Turret1) 
+                            document.getElementById( 'mainTitle' ).innerHTML = 'Fire';
+                        else if  (i instanceof Turret2) 
+                            document.getElementById( 'mainTitle' ).innerHTML = 'Water';
+                        let data = i.getLevelUp();
+         
+                        document.getElementById( 'title3' ).innerHTML = 'Level 2';
+                        document.getElementById( 'dmdg3' ).innerHTML = i.attackDamadge;
+                        document.getElementById( 'range3' ).innerHTML = i.attackRange;
+                        document.getElementById( 'speed3' ).innerHTML =  i.attackSpeed;
+                        document.getElementById( 'proj3' ).innerHTML =  i.projectilSpeed;
+                        document.getElementById( 'cost3' ).innerHTML =  i.price;
+                    }
+                
+                    towerDiv.style.display = 'block';
+                    this.selectedTower = indexT;
+                    return;
+                }
+            });
+
+            if (foundInside == 0) {
+                towerDiv.style.display = 'none';
+                this.selectedTower = -1;
+            }
         }
 
+
+
+        
         this.renderer.render( this.scene , this.camera );
     }
 
@@ -247,7 +336,11 @@ export default class Application {
                         this.objects.push(i);
                         this.scene.add(i.getMesh() );
                     });
-                }
+                    mesh[index].turretClass.map ((i) => {
+                        this.objects.push(i);
+                        this.scene.add(i.getMesh() );
+                    });
+                } 
             }
         else 
             if (mesh instanceof Obj) {
@@ -260,34 +353,30 @@ export default class Application {
                 this.objectsNoUpdate.push(mesh);
                 this.scene.add( mesh.getLight() );
             } else if (mesh instanceof Zone) {
-                mesh.objectsNoUpdate.map ((i) => {
+                mesh.objects.map ((i) => {
                     this.objects.push(i);
                     this.scene.add(i.getMesh() );
                 });
+                mesh.turretClass.map ((i) => {
+                    this.objects.push(i);
+                    this.scene.add(i.getMesh() );
+                });
+            } else if (mesh instanceof Turret) {
+                this.scene.add(mesh.getMesh() );
+                this.objects.push(mesh);
             }
         
     }
 
     remove(id) {
-        console.log(id);
         this.scene.remove( this.playerForId(id).mesh );
     }
 
     onMouseClick(event){
-        this.add(this.objs);
+        if (this.flag == 0)
+            this.add(this.objs);
+        this.flag = 1;
         this.controls.lock();
-    }
-
-    onMouseDown(){
-
-    }
-
-    onMouseUp(){
-
-    }
-
-    onMouseOut(){
-
     }
 
     onKeyDown( event ){
@@ -309,11 +398,70 @@ export default class Application {
                 this.light.castShadow = false;
             else
                 this.light.castShadow = true;
-        } else
+        } else if (event.keyCode == 49) { // 1
+            if (this.selectedTower != -1) { 
+                    let zoneData = this.zone[this.zoneForId(this.MainPlayer.playerId)];
+                    if (zoneData.turretClass[this.selectedTower] instanceof TurretFree) {
+                        if (this.MainPlayer.money - this.turretExemple[0].price >= 0) {
+                            let dataTurret = zoneData.turretClass[this.selectedTower];
+                            zoneData.turretClass[this.selectedTower] = new Turret1 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                            this.MainPlayer.money -= this.turretExemple[0].price;
+                            let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                            this.scene.remove(tmpobj);
+                            this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                            this.add(zoneData.turretClass[this.selectedTower]);
+                            this.zone[this.zoneForId(this.MainPlayer.playerId)].turret[this.selectedTower] = 1;
+                            this.sendUpdateZoneData();
+                        }
+                    }
+                    else {
+                        if (this.MainPlayer.money -zoneData.turretClass[this.selectedTower].getLevelUp().price >= 0) {
+                            zoneData.turretClass[this.selectedTower].levelUp();
+                            this.MainPlayer.money -= zoneData.turretClass[this.selectedTower].getLevelUp().price;
+                            this.zone[this.zoneForId(this.MainPlayer.playerId)].turretUpgrades[this.selectedTower] = 1;
+                            
+                            this.sendUpdateZoneData();
+                        }
+                    }
+                    document.getElementById("money").innerHTML= this.MainPlayer.money;
+                }
+        } else if (event.keyCode == 50) { // 2
+            if (this.selectedTower != -1) { 
+                let zoneData = this.zone[this.zoneForId(this.MainPlayer.playerId)];
+                if (zoneData.turretClass[this.selectedTower] instanceof TurretFree) {
+                    if (this.MainPlayer.money - this.turretExemple[1].price >= 0) {
+                        let dataTurret = zoneData.turretClass[this.selectedTower];
+                        zoneData.turretClass[this.selectedTower] = new Turret2 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                        this.MainPlayer.money -= this.turretExemple[1].price;
+                        let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                        this.scene.remove(tmpobj);
+                        this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                        this.add(zoneData.turretClass[this.selectedTower]);
+                        
+                        this.zone[this.zoneForId(this.MainPlayer.playerId)].turret[this.selectedTower] = 2;
+                        this.sendUpdateZoneData();
+                    }
+                }
+                else {
+                    let dataTurret = zoneData.turretClass[this.selectedTower];
+                    zoneData.turretClass[this.selectedTower] = new TurretFree ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                    this.MainPlayer.money += dataTurret.price;
+                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                    this.scene.remove(tmpobj);
+                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                    this.add(zoneData.turretClass[this.selectedTower]);
+                    this.zone[this.zoneForId(this.MainPlayer.playerId)].turret[this.selectedTower] = 0;
+                    this.zone[this.zoneForId(this.MainPlayer.playerId)].turretUpgrades[this.selectedTower] = 0;
+                    this.sendUpdateZoneData();
+                }
+                document.getElementById("money").innerHTML= this.MainPlayer.money;
+            }
+        } else  if ( typeof this.MainPlayer.mesh != "undefined")
             this.MainPlayer.keyState[event.keyCode || event.which] = true;
     }
 
     onKeyUp( event ){
+        if ( typeof this.MainPlayer.keyState != "undefined")
         this.MainPlayer.keyState[event.keyCode || event.which] = false;
     }
 
@@ -323,21 +471,67 @@ export default class Application {
         this.renderer.setSize( window.innerWidth, window.innerHeight );
     }
 
-    onMouseMove (event) {
+
+    updateZone(zoneData) {
+        let zoneIndex = this.zoneForId("");
+        zoneData.turret.map ( (v, i) => {
+            if (typeof this.zone[zoneIndex] != "undefined")            
+            if (v != this.zone[zoneIndex].turret[i]) {
+                let zoneDataInner = this.zone[zoneIndex];
+                if (v == 0) { // free turret
+                    let dataTurret = zoneDataInner.turretClass[i];
+                    zoneDataInner.turretClass[i] = new TurretFree ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                    this.scene.remove(tmpobj);
+                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                    this.add(zoneDataInner.turretClass[i]);
+                    zoneDataInner.turret[this.selectedTower] = 0;
+                    zoneDataInner.turretUpgrades[this.selectedTower] = 0;
+                }
+                if (v == 1) { // fire turret
+                    let dataTurret = zoneDataInner.turretClass[i];
+                    zoneDataInner.turretClass[i] = new Turret1 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                    this.scene.remove(tmpobj);
+                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                    this.add(zoneDataInner.turretClass[i]);
+                    zoneDataInner.turret[this.selectedTower] = 1;
+                    zoneDataInner.turretUpgrades[this.selectedTower] = 1;
+                } 
+                if (v == 2) { // water turret
+                    let dataTurret = zoneDataInner.turretClass[i];
+                    zoneDataInner.turretClass[i] = new Turret2 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                    this.scene.remove(tmpobj);
+                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                    this.add(zoneDataInner.turretClass[i]);
+                    zoneDataInner.turret[this.selectedTower] = 2;
+                    zoneDataInner.turretUpgrades[this.selectedTower] = 2;
+                }
+            }
+        });
+        zoneData.turretUpgrades.map ( (v, i) => {
+            if (typeof this.zone[zoneIndex] != "undefined")        
+            if (v > this.zone[zoneIndex].turretUpgrades[i]) 
+                this.zone[zoneIndex].turretClass[i].levelUp();
+        });
+        this.zone[zoneIndex].updateZone(zoneData);
     }
 
-    updateZone(zone) {
-        let zoneIndex = this.zoneForId(zone.playerId);
-        this.zone[zoneIndex].updateZone(zone);
+    sendUpdateZoneData () {
+        let zoneData = this.zone[this.zoneForId(this.MainPlayer.playerId)];
+        let data ={} ;
+        data.playerId = this.MainPlayer.playerId;
+        data.wave = zoneData.wave;
+        data.turret = zoneData.turret;
+        data.turretUpgrades = zoneData.turretUpgrades;
+        socket.emit('updateZone', data);
     }
 
     associateZone(zone) {
         this.zone[zone.index].updateZone(zone);
-        console.log("Associate");
-        console.log(zone);
-        console.log(this.zone[zone.index]);
     }
-// 
+
     calculateIntersects( event ){
 
         //Determine objects intersected by raycaster
@@ -357,11 +551,9 @@ export default class Application {
     setMainPlayer(player) {
         this.MainPlayer = player;
         this.zone.map((i) => {
-            if (typeof i.playerId === "undefined") {
-                
-                console.log("aaa");
+            if ((player.x < 0 && i.inv == 1) || (player.x > 0 && i.inv == -1))
+            if (typeof i.playerId === "undefined" && this.zoneForId(player.playerId) == -1) {
                 i.associatePlayer(player.playerId);
-                return 0;
             }
         } );
     }
@@ -378,14 +570,15 @@ export default class Application {
     };
 
     zoneForId (id){
-        var index;
+        var index = -1;
+        if (typeof this.zone != 'undefined')
         for (var i = 0; i < this.zone.length; i++)
-            if (this.zone[i].playerId == id){
+            if (this.zone[i].playerId == id || (typeof this.zone[i].playerId === "undefined" && id == "")){
                 index = i;
                 break;
             }
         
-        return i;
+        return index;
     };
 }
 

@@ -91,7 +91,7 @@ class Zone {
         this.x = data.x;
         this.y = data.y;
         this.z = data.z;
-        this.inv = zone.length == 0 ? -1 : 1; 
+        this.inv = data.inv; 
         
         this.playerId = data.playerId;
         this.wave = data.wave;
