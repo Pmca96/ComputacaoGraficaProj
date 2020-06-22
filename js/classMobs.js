@@ -11,7 +11,7 @@ class Mobs extends THREE.Object3D {
         this.signalVector = 1;
         if (this.position.y < 0)
             this.signalVector = -1
-        this.up = new THREE.Vector3( 0, 1, 0 );
+        this.up = new THREE.Vector3( 0, 0, 1 );
     }
 
     moveOnSpline(currentTime) {
@@ -31,7 +31,7 @@ class Mobs extends THREE.Object3D {
             this.radians = Math.acos( this.up.dot( this.tangent ) );
         
             // set the quaternion
-            //this.mesh.quaternion.setFromAxisAngle( axis, this.radians );
+            this.mesh.quaternion.setFromAxisAngle( axis, this.radians);
             this.t += 0.00025;
             this.t += 0.00225;
             return this.t;
@@ -65,6 +65,7 @@ class Wolf extends Mobs {
             this.rotation.y = Math.PI;
         loadMesh2(path, material, this, function (fn) {
             fn.visible=false;
+      
         });
     }
 
@@ -80,47 +81,39 @@ class Spline {
     constructor(position, inv, timeSpawn) {
         
         this.spline = new THREE.CatmullRomCurve3([
-            new THREE.Vector3(position.x, position.y+1, position.z),
-            new THREE.Vector3(position.x, position.y+1, position.z*2/3),
-            new THREE.Vector3(position.x, position.y+1, position.z/3),
-            new THREE.Vector3(-2*inv, position.y+1, 0),
+            new THREE.Vector3(position.x, position.y, position.z),
+            new THREE.Vector3(position.x, position.y, position.z*2/3),
+            new THREE.Vector3(position.x, position.y, position.z/3),
+            new THREE.Vector3(-2*inv, position.y, 0),
            // new THREE.Vector3(-10*inv, position.y+1, 0),
-            new THREE.Vector3(-20*inv, position.y+1, 0),
+            new THREE.Vector3(-20*inv, position.y, 0),
             
-            new THREE.Vector3(-20*inv, position.y+1, 20*inv),
+            new THREE.Vector3(-20*inv, position.y, 20*inv),
             //new THREE.Vector3(-20*inv, position.y+1, 40*inv),
-            new THREE.Vector3(-21*inv, position.y+1, 41*inv),
-            new THREE.Vector3(-31*inv, position.y+1, 41*inv),
-            new THREE.Vector3(-42*inv, position.y+1, 40*inv),
+            new THREE.Vector3(-21*inv, position.y, 41*inv),
+            new THREE.Vector3(-31*inv, position.y, 41*inv),
+            new THREE.Vector3(-42*inv, position.y, 40*inv),
            // new THREE.Vector3(-42*inv, position.y+1, 39*inv),
-            new THREE.Vector3(-42*inv, position.y+1, 24*inv),
+            new THREE.Vector3(-42*inv, position.y, 24*inv),
            // new THREE.Vector3(-42*inv, position.y+1, 12*inv),
-            new THREE.Vector3(-41*inv, position.y+1, 11*inv),
+            new THREE.Vector3(-41*inv, position.y, 11*inv),
            // new THREE.Vector3(-31*inv, position.y+1, 11*inv),
-            new THREE.Vector3(-31*inv, position.y+1, 10*inv),
-            new THREE.Vector3(-30*inv, position.y+1, 0),
-            new THREE.Vector3(-25*inv, position.y+1, 0),
-            //new THREE.Vector3(-24.5*inv, position.y+1, -0.5*inv),
-            new THREE.Vector3(-24.5*inv, position.y+1, -7.5*inv),
-            new THREE.Vector3(-25*inv, position.y+1, -15*inv),
-            //new THREE.Vector3(-24*inv, position.y+1, -15*inv),
-            new THREE.Vector3(-19*inv, position.y+1, -13*inv),
-            //new THREE.Vector3(-18*inv, position.y+1, -14*inv),
-            new THREE.Vector3(-18*inv, position.y+1, -27*inv),
-            //new THREE.Vector3(-18*inv, position.y+1, -44*inv),
-            new THREE.Vector3(-19*inv, position.y+1, -45*inv),
-            new THREE.Vector3(-28*inv, position.y+1, -45*inv),
-            new THREE.Vector3(-37*inv, position.y+1, -46*inv),
-            //new THREE.Vector3(-38*inv, position.y+1, -45*inv),
-            new THREE.Vector3(-38*inv, position.y+1, -34*inv),
-            new THREE.Vector3(-37*inv, position.y+1, -26.5*inv),
-            //new THREE.Vector3(-39*inv, position.y+1, -27*inv),
-            //new THREE.Vector3(-47*inv, position.y+1, -27*inv),
-            new THREE.Vector3(-47*inv, position.y+1, -26*inv),
-            new THREE.Vector3(-47*inv, position.y+1, -13*inv),
-            new THREE.Vector3(-47*inv, position.y+1, -1*inv),
-            //new THREE.Vector3(-48*inv, position.y+1, -0.3*inv),
-            new THREE.Vector3(-55*inv, position.y+1, -0.3*inv),
+            new THREE.Vector3(-31*inv, position.y, 10*inv),
+            new THREE.Vector3(-30*inv, position.y, 0),
+            new THREE.Vector3(-25*inv, position.y, 0),
+            new THREE.Vector3(-24.5*inv, position.y, -7.5*inv),
+            new THREE.Vector3(-25*inv, position.y, -15*inv),
+            new THREE.Vector3(-19*inv, position.y, -13*inv),
+            new THREE.Vector3(-18*inv, position.y, -27*inv),
+            new THREE.Vector3(-19*inv, position.y, -45*inv),
+            new THREE.Vector3(-28*inv, position.y, -45*inv),
+            new THREE.Vector3(-37*inv, position.y, -46*inv),
+            new THREE.Vector3(-38*inv, position.y, -34*inv),
+            new THREE.Vector3(-37*inv, position.y, -26.5*inv),
+            new THREE.Vector3(-47*inv, position.y, -26*inv),
+            new THREE.Vector3(-47*inv, position.y, -13*inv),
+            new THREE.Vector3(-47*inv, position.y, -1*inv),
+            new THREE.Vector3(-55*inv, position.y, -0.3*inv),
         ], false, "centripetal", 0);
         var material = new THREE.LineBasicMaterial({
             color: 0xff00f0,
