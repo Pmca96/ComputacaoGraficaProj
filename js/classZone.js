@@ -1,7 +1,8 @@
 import socket from './main.js';
-import { TurretFree, Turret1,Turret2  } from './classTurrets.js';
-import {Castle,Market,MedievalHouse, SkyTower, Toilet,Houses,FantasyHouses, LittlePolly, Wolf} from './classBuildings.js';
+import { TurretFree  } from './classTurrets.js';
+import {Castle,Market,MedievalHouse, SkyTower, Toilet,Houses,FantasyHouses, LittlePolly} from './classBuildings.js';
 import {Labyrinth} from './classLands.js';
+import Wave from './classWave.js';
 export default class Zone {
     constructor( data , inv = 1){
         this.x = data.x;
@@ -13,7 +14,10 @@ export default class Zone {
         this.turretUpgrades = [0,0,0,0,0,0];
         this.turretClass = [];
         this.playerId;
-        this.wave=1;
+        this.wave=0;
+        this.waves = [];
+        this.timeBetweenWaves = 20;
+        this.timer = 1;
         this.createZone(); 
     }
 
@@ -30,12 +34,7 @@ export default class Zone {
         let labWall = new pathWall({x : 0, y : 0, z : 0}, this.inv);
         this.objects.push(labWall);
 
-        //Temporary
-        let Wolf1 = new Wolf({x : -7*this.inv, y : -0.7, z : 80*this.inv}, {y : Math.PI / 2},  this.inv);
-        let Wolf2 = new Wolf({x : -5*this.inv, y : -0.7, z : 90*this.inv}, {y : Math.PI / 2},  this.inv);
-        let Wolf3 = new Wolf({x : -7*this.inv, y : -0.7, z : -80*this.inv}, {y : Math.PI / 2 + Math.PI},  this.inv);
-        let Wolf4 = new Wolf({x : -5*this.inv, y : -0.7, z : -90*this.inv}, {y : Math.PI / 2 +  Math.PI},  this.inv);
-        this.objects.push(Wolf1,Wolf2,Wolf3,Wolf4);
+        this.createWave(0);
     }
 
     createTurrets (){
@@ -97,5 +96,51 @@ export default class Zone {
         this.turretUpgrades = data.turretUpgrades;
     }
 
+    createWave(isMainPlayerOfStructure) {
+        let createdWave;
+        if (this.waves.length > 10 ) { 
+            createdWave = new Wave(Math.round(this.waves.length/10)); // levelUp
+            for (let index = 0; index < (this.waves.length%10) + 5; index++) {
+                let randomX = 0;
+                let randomZ = 0;
+                let position = {x:-7, y:0.7, z:80};
+                createdWave.addWolf(position, this.inv, (index+1) * 3);
+            }
+        } else { 
+            createdWave = new Wave(1);
+            for (let index = 0; index < this.waves.length+1; index++) {
+                
+                let randomX = Math.floor(Math.random() * 14) - 7;
+                let randomZ = Math.floor(Math.random() * 40) - 20 ;
+                if (randomZ <= 0 )
+                    randomZ += 95;
+                else 
+                    randomZ -= 95;
+                let position = {x:randomX, y:-0.7, z:randomZ};
+                    
+                createdWave.addWolf(position, this.inv, index + 2);
+            }
+        }
+        this.waves.push(createdWave);
+        if (isMainPlayerOfStructure == 1)
+            document.getElementById("wave").innerHTML = this.waves.length-1;
+    }
 
+    startTimer() {
+        var self = this;
+        self.timer = self.timeBetweenWaves;
+        let interval = setInterval(function () {
+            self.timer -=  1;
+            if (self.timer == 0) 
+                clearInterval(interval) ;
+            else  {
+                let min = Math.floor(self.timer / 60);
+                let sec = Math.floor(self.timer % 60);
+                document.getElementById("counterTime").innerHTML = ('00' + min).slice(-2)+":"+('00' + sec).slice(-2);
+            }
+                
+        }, 1000);
+    }
+    
 }
+

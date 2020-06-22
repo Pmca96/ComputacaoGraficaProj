@@ -69,6 +69,7 @@ function startTimer(duration) {
     }, 1000);
 }
 
+
 window.onload = function () {
     var time = 6;
 

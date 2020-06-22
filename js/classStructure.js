@@ -4,7 +4,9 @@ import  Zone from './classZone.js';
 import  Player from './classPlayer.js';
 import {Fire}  from './libs/fire.js';
 import  {Land, Route} from './classLands.js';
-import  {Wolf, Buildings, Castle} from './classBuildings.js';
+import  {Buildings, Castle} from './classBuildings.js';
+import  {Wolf, Mobs} from './classMobs.js';
+import  Wave from './classWave.js';
 class Obj extends THREE.Object3D{
     constructor(x,y,z){
         super();
@@ -50,8 +52,8 @@ export default class Application {
         this.clock = new THREE.Clock();
         this.objects = [];
         this.objectsNoUpdate = [];
+        this.mobs=[];
         this.players = [];
-        this.wave=1;
         this.createScene();  
         this.building = 1;
         //MAIN OBJECTS TO LOAD
@@ -200,14 +202,42 @@ export default class Application {
             this.render();
           });
 
+
+
         this.delta = this.clock.getDelta();
+        
         this.objects.forEach((object) => {
+            if (object instanceof Buildings || object instanceof Turret)
+                object.update();
+            });
+
+        this.mobs.forEach((object) => {
             if (object instanceof Wolf) {
                 if (object.mixer) 
                     object.mixer.update(this.delta);
-            } else if (object instanceof Buildings || object instanceof Turret)
-                object.update();
-          });
+            
+                
+                let indexZone = this.zoneForId(this.MainPlayer.playerId);
+                let positionX_beforeMovement = object.mesh.position.x;
+                let reachedCastle = object.moveOnSpline(this.zone[indexZone].timeBetweenWaves - this.zone[indexZone].timer);
+                if (reachedCastle >= 1) {
+                    let dataObj = this;
+                    this.zone.map ((i) => {
+                        if ( (i.inv > 0 && positionX_beforeMovement < 0 ) || (i.inv < 0 && positionX_beforeMovement >  0 )) {
+                            if (typeof i.playerId  != "undefined" && i.playerId  != "") {
+                                let pIndex = dataObj.playerForId(i.playerId);
+                                pIndex.lives-=1;
+                            }
+                        }
+                    });
+                    this.scene.remove(object.spline.line);
+                    this.scene.remove(object.spline.spline);
+                    this.scene.remove(object.mesh);
+                }
+                
+                document.getElementById("health").innerHTML = this.MainPlayer.lives;
+            }
+        });
         
         if ( typeof this.MainPlayer.mesh != "undefined" && typeof this.MainPlayer.mixer != "undefined"  ){
             if (this.MainPlayer != "")
@@ -307,9 +337,22 @@ export default class Application {
                 towerDiv.style.display = 'none';
                 this.selectedTower = -1;
             }
+
+            this.zone.map ((i) => {
+                if (i.playerId != "" && i.timer == 0 ) {
+                    if (this.MainPlayer.playerId == i.playerId)
+                        i.createWave(1);
+                    else
+                        i.createWave(0);
+                        setTimeout(() => {  this.add(i.waves[i.waves.length-1]) }, 5000);
+                      
+                    
+                    i.startTimer();
+                }
+            });
         }
 
-
+       
 
         
         this.renderer.render( this.scene , this.camera );
@@ -317,6 +360,7 @@ export default class Application {
 
     add(mesh) {
         
+     
         if (Array.isArray(mesh))
             for(var index in mesh) {
                 if (mesh[index] instanceof Land ) {
@@ -340,7 +384,7 @@ export default class Application {
                         this.objects.push(i);
                         this.scene.add(i.getMesh() );
                     });
-                } 
+                }
             }
         else 
             if (mesh instanceof Obj) {
@@ -364,13 +408,29 @@ export default class Application {
             } else if (mesh instanceof Turret) {
                 this.scene.add(mesh.getMesh() );
                 this.objects.push(mesh);
-            }
+            } else if (mesh instanceof Wave) {
+                if (this.mobs.length > 0) {
+                    this.mobs.map ((i) => this.scene.remove(i.mesh));
+                    this.mobs.map ((i) => {
+                        this.scene.remove(i.spline.line);
+                        this.scene.remove(i.spline.spline);
+                    });
+                    this.mobs = [];
+                }
+                mesh.wolfs.map ((i) => {
+                    this.mobs.push(i);
+                    this.scene.add(i.getMesh() );
+                    this.scene.add(i.spline.getLine());
+                });
+            } 
         
     }
 
     remove(id) {
         this.scene.remove( this.playerForId(id).mesh );
     }
+
+    
 
     onMouseClick(event){
         if (this.flag == 0)
@@ -530,6 +590,9 @@ export default class Application {
 
     associateZone(zone) {
         this.zone[zone.index].updateZone(zone);
+        if (this.zone[zone.index].playerId == "" && zone.playerId != "") {
+            this.zone[zone.index].startTimer();
+        }
     }
 
     calculateIntersects( event ){
@@ -554,19 +617,24 @@ export default class Application {
             if ((player.x < 0 && i.inv == 1) || (player.x > 0 && i.inv == -1))
             if (typeof i.playerId === "undefined" && this.zoneForId(player.playerId) == -1) {
                 i.associatePlayer(player.playerId);
+                i.startTimer();
             }
         } );
     }
 
     playerForId (id){
-        var index;
+        var index = -1;
         for (var i = 0; i < this.players.length; i++){
+            console.log("Player");
+            console.log(this.players[i].playerId + " --- " + id);
             if (this.players[i].playerId == id){
                 index = i;
                 break;
             }
         }
-        return this.players[i];
+        if (index == -1)
+            return 0;
+        return this.players[index];
     };
 
     zoneForId (id){

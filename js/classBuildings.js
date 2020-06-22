@@ -1,5 +1,5 @@
 class Buildings extends THREE.Object3D {
-    constructor(position, inv) {
+    constructor() {
         super();
     }
 }
@@ -269,38 +269,6 @@ class SkyTower extends Buildings {
     }
 }
 
-//Para ser criada a classe
-class Wolf extends Buildings {
-
-    constructor(position, inv) {
-        super();
-        this.createWolf(position.x, position.y, position.z, inv);
-    }
-
-    createWolf(x, y, z, inv){
-        let path = "models/wolf/Wolf-Blender-2.82a.gltf";
-        let material = "";
-
-        this.position.x = x;
-        this.position.y = y;
-        this.position.z = z;
-        this.scale.x = 4;
-        this.scale.y = 4;
-        this.scale.z = 3;
-        if (inv != 1)
-            this.rotation.y = Math.PI;
-   
-        loadMesh1(path, material, this, function (fn) {
-        });
-    }
-
-    getMesh() {
-        return this.mesh;
-    }
-    update(){
-    }
-}
-
 
 //GLTF loader
 function loadMesh1(path, textureM, objectClass, fn) {
@@ -337,19 +305,9 @@ function loadMesh1(path, textureM, objectClass, fn) {
         objectClass.mesh.scale.x = objectClass.scale.x;
         objectClass.mesh.scale.y = objectClass.scale.y;
         objectClass.mesh.scale.z = objectClass.scale.z;
-        if (objectClass instanceof Wolf)  {
-            objectClass.clip = [];
-            objectClass.animations = gltf.animations;
-            objectClass.mixer = new THREE.AnimationMixer( objectClass.mesh );
-          
-            objectClass.animations.map((v,i) => {
-                objectClass.clip[i] = objectClass.mixer.clipAction(v);
-            })
-            objectClass.clip[0].play();
-        }
         fn(objectClass);
     } );
 }
 
 
-export { Castle,Market,MedievalHouse, SkyTower ,Houses, Toilet, FantasyHouses,LittlePolly,Wolf, Buildings};
+export { Castle,Market,MedievalHouse, SkyTower ,Houses, Toilet, FantasyHouses,LittlePolly, Buildings};
