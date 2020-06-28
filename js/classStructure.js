@@ -2,11 +2,11 @@ import socket from './main.js';
 import  {Turret, TurretFree, Turret1, Turret2} from './classTurrets.js';
 import  Zone from './classZone.js';
 import  Player from './classPlayer.js';
-import {Fire}  from './libs/fire.js';
 import  {Land, Route} from './classLands.js';
 import  {Buildings, Castle} from './classBuildings.js';
 import  {Wolf, Mobs} from './classMobs.js';
 import  Wave from './classWave.js';
+import  Projectil from './classProjectil.js';
 class Obj extends THREE.Object3D{
     constructor(x,y,z){
         super();
@@ -54,6 +54,7 @@ export default class Application {
         this.objectsNoUpdate = [];
         this.mobs=[];
         this.players = [];
+        this.projectil = [];
         this.createScene();  
         this.building = 1;
         //MAIN OBJECTS TO LOAD
@@ -67,6 +68,7 @@ export default class Application {
         ];
         this.selectedTower = -1;
         this.flag = 0;
+        this.gameStatus = 0;
     }
 
     createScene() {
@@ -133,31 +135,8 @@ export default class Application {
             .setPath( 'images/' )
             .load( [ 'xneg.png', 'xpos.png',  'zpos.png', 'zneg.png','ypos.png', 'yneg.png' ] );
 
-
-            // let fire = new Fire( geometry, {
-            //     textureWidth: 512,
-            //     textureHeight: 512,
-            //     debug: true
-            // } );
-            // fire.color1 = 0xffdcaa;
-            // fire.color2 = 0xffa000;
-            // fire.color3 = 0x000000;
-            // fire.windX = 0.0;
-            // fire.windY = 2.75;
-            // fire.colorBias = 0.9;
-            // fire.burnRate = 0;
-            // fire.diffuse = 1.33;
-            // fire.viscosity = 0.25;
-            // fire.expansion = 1;
-            // fire.swirl = 50.0;
-            // fire.drag = 1;
-            // fire.airSpeed = 50.0;
-            // fire.speed = 500.0;
-            // fire.massConservation = false;
-            // fire.position.z = 2;
-            // console.log(fire);
-            // this.scene.add(fire);
-
+         
+           
             //Events------------------------------------------
         let Application = this;
 
@@ -187,7 +166,7 @@ export default class Application {
         container.appendChild( this.renderer.domElement );
         document.body.appendChild( container );
     
-
+        socket.emit('requestUpdateZone');
         this.render();
 
     }
@@ -202,44 +181,134 @@ export default class Application {
             this.render();
           });
 
-
+        this.startGame();
 
         this.delta = this.clock.getDelta();
         
         this.objects.forEach((object) => {
-            if (object instanceof Buildings || object instanceof Turret)
-                object.update();
-            });
+            if (object instanceof Buildings || object instanceof Turret) {
+                if (object instanceof Turret2)
+                    object.update(this.mobs);
+                else
+                    object.update();
 
-        this.mobs.forEach((object) => {
+                if (object instanceof Turret1 || object instanceof Turret2){
+                    this.mobs.forEach((object1) => {
+                        //confirma distancia de raio , se sim tenta atacar
+                        let distance = Math.sqrt(Math.pow(object.mesh.position.x-object1.mesh.position.x,2) + 
+                        // Math.pow(object.mesh.position.y-object1.mesh.position.y,2) + 
+                        Math.pow(object.mesh.position.z-object1.mesh.position.z,2));
+                        if (distance <= object.attackRange) { // se conseguir atacar com o projetil da torre
+                            let typeProjectil = object.attackToPosition(object1.mesh);
+                            if (typeProjectil != 0) { // fire (1) & water (2)
+                                let projCreation = new Projectil (object, typeProjectil, object1.mesh.position );
+                                this.add(projCreation);
+                            }
+                        }
+                    });
+                }
+            }
+
+            
+        });
+        
+        this.projectil.forEach((object) => {
+            object.update();
+        });
+
+        this.mobs.forEach((object, indexMob) => {
+         
             if (object instanceof Wolf) {
                 if (object.mixer) 
                     object.mixer.update(this.delta);
             
-                
+
                 let indexZone = this.zoneForId(this.MainPlayer.playerId);
-                let positionX_beforeMovement = object.mesh.position.x;
-                let reachedCastle = object.moveOnSpline(this.zone[indexZone].timeBetweenWaves - this.zone[indexZone].timer);
-                if (reachedCastle >= 1) {
-                    let dataObj = this;
-                    this.zone.map ((i) => {
-                        if ( (i.inv > 0 && positionX_beforeMovement < 0 ) || (i.inv < 0 && positionX_beforeMovement >  0 )) {
-                            if (typeof i.playerId  != "undefined" && i.playerId  != "") {
-                                let pIndex = dataObj.playerForId(i.playerId);
-                                pIndex.lives-=1;
-                            }
-                        }
+
+                //[status:1,indexes:{}] hit
+                //[status:2,indexes:{}] dead
+                let isHitted = object.update(this.projectil);
+                if (isHitted.status == 2) {
+                    let infoMobMesh = this.mobs[indexMob];
+                    this.scene.remove(infoMobMesh.spline.spline);
+                    this.scene.remove(infoMobMesh.mesh);
+                    this.mobs = this.mobs.slice(indexMob+1);
+
+                    
+                    if ((object.mesh.position.x > 0 && this.zone[indexZone].inv == -1) ||(object.mesh.position.x < 0 && this.zone[indexZone].inv == 1)  ) {
+                        this.MainPlayer.money +=object.coins;
+                        document.getElementById("money").innerHTML= this.MainPlayer.money;
+                    }
+                    
+                    isHitted.indexes.map((i, index) => {
+                        let infoMesh = this.projectil[index].mesh;
+                        this.projectil = this.projectil.slice(index+1);
+                        this.scene.remove(infoMesh);
                     });
-                    this.scene.remove(object.spline.line);
-                    this.scene.remove(object.spline.spline);
-                    this.scene.remove(object.mesh);
+                } else {
+                    let positionX_beforeMovement = object.mesh.position.x;
+                    let reachedCastle = object.moveOnSpline(this.zone[indexZone].timeBetweenWaves - this.zone[indexZone].timer);
+                    if (reachedCastle >= 1) {
+                        let dataObj = this;
+                        this.zone.map ((i) => {
+                            if ( (i.inv > 0 && positionX_beforeMovement < 0 ) || (i.inv < 0 && positionX_beforeMovement >  0 )) {
+                                if (typeof i.playerId  != "undefined" && i.playerId  != "") {
+                                    let pIndex = dataObj.playerForId(i.playerId);
+                                    pIndex.lives-=1;
+                                    if (pIndex.lives == 0 ) {
+                                        this.gameStatus = 2;
+                                        if ( i.playerId == this.MainPlayer.playerId )
+                                            document.getElementById("timer").innerHTML = "You Lost";
+                                        else 
+                                            document.getElementById("timer").innerHTML = "You Won";
+                                        document.getElementById("instructions").style.backgroundColor  = "black";
+
+                                        instructions.style.display = 'none';
+                                        while(this.scene.children.length > 0)
+                                            this.scene.remove(this.scene.children[0]); 
+
+                                        this.objects = [];
+                                        this.objectsNoUpdate = [];
+                                        this.mobs=[];
+                                        this.players = [];
+                                        this.projectil = [];
+                                        return 0;
+
+                                    }
+                                }
+                            }
+                        });
+                        if (this.gameStatus != 2) {
+                            let infoMobs = this.mobs[indexMob];
+                            this.scene.remove(infoMobs.spline.spline);
+                            this.scene.remove(infoMobs.mesh);
+                            this.mobs = this.mobs.slice(indexMob+1);
+                        }
+                        
+                    }
+                    if (isHitted.status == 1)
+                        isHitted.indexes.map((i, index) => {
+                            let infoMesh = this.projectil[index].mesh;
+                            this.projectil = this.projectil.slice(index+1);
+                            this.scene.remove(infoMesh);
+                        });
+                    
                 }
                 
                 document.getElementById("health").innerHTML = this.MainPlayer.lives;
             }
         });
+
+        this.projectil.forEach((object, ind) => {
+            //valida se o projetil esta no final da spline para ser removido
+            if (object.t >= 1) {
+                this.scene.remove(object.mesh);
+                this.projectil =this.projectil.slice(ind+1);
+            }
+        });
+        let timerInfo = document.getElementById( 'counterTime' ).innerHTML.trim();
         
-        if ( typeof this.MainPlayer.mesh != "undefined" && typeof this.MainPlayer.mixer != "undefined"  ){
+        if ( typeof this.MainPlayer.mesh != "undefined" && typeof this.MainPlayer.mixer != "undefined" ){
             if (this.MainPlayer != "")
             this.MainPlayer.updateCameraPosition(this.camera, this.light);
             this.MainPlayer.checkKeyStates();
@@ -252,12 +321,11 @@ export default class Application {
             let meshMainP =this.MainPlayer.mesh.position;
             let foundInside = 0;
             let towerDiv = document.getElementById( 'towerDiv' );
-            if (indexZone > -1 )
+            if (indexZone > -1 &&  timerInfo != '--:--' )
             this.zone[indexZone].turretClass.map ( (i, indexT  ) => {
                 let distance = Math.sqrt(Math.pow(meshMainP.x-i.mesh.position.x,2) + Math.pow(meshMainP.y-i.mesh.position.y,2) + Math.pow(meshMainP.z-i.mesh.position.z,2));
                 if (distance < 3.5)  {
                     foundInside = 1;
-     
                     if (i instanceof TurretFree) {
                         document.getElementById( 'towerOption2' ).style.display = 'none';
                         document.getElementById( 'towerOption1' ).style.display = 'block';
@@ -273,8 +341,6 @@ export default class Application {
                         document.getElementById( 'range2' ).innerHTML = this.turretExemple[1].attackRange;
                         document.getElementById( 'speed1' ).innerHTML = this.turretExemple[0].attackSpeed;
                         document.getElementById( 'speed2' ).innerHTML = this.turretExemple[1].attackSpeed;
-                        document.getElementById( 'proj1' ).innerHTML = this.turretExemple[0].projectilSpeed;
-                        document.getElementById( 'proj2' ).innerHTML = this.turretExemple[1].projectilSpeed;
                         document.getElementById( 'cost1' ).innerHTML = this.turretExemple[0].price;
                         document.getElementById( 'cost2' ).innerHTML = this.turretExemple[1].price;
                         document.getElementById( 'costText' ).innerHTML =  "Cost";
@@ -299,8 +365,6 @@ export default class Application {
                         document.getElementById( 'range2' ).innerHTML = data.attackRange;
                         document.getElementById( 'speed1' ).innerHTML =  i.attackSpeed;
                         document.getElementById( 'speed2' ).innerHTML =  data.attackSpeed;
-                        document.getElementById( 'proj1' ).innerHTML =  i.projectilSpeed;
-                        document.getElementById( 'proj2' ).innerHTML =  data.projectilSpeed;
                         document.getElementById( 'cost1' ).innerHTML =  data.price;
                         document.getElementById( 'cost2' ).innerHTML =  i.price;
                         document.getElementById( 'costText' ).innerHTML =  "Sell";
@@ -323,7 +387,6 @@ export default class Application {
                         document.getElementById( 'dmdg3' ).innerHTML = i.attackDamadge;
                         document.getElementById( 'range3' ).innerHTML = i.attackRange;
                         document.getElementById( 'speed3' ).innerHTML =  i.attackSpeed;
-                        document.getElementById( 'proj3' ).innerHTML =  i.projectilSpeed;
                         document.getElementById( 'cost3' ).innerHTML =  i.price;
                     }
                 
@@ -337,19 +400,23 @@ export default class Application {
                 towerDiv.style.display = 'none';
                 this.selectedTower = -1;
             }
-
-            this.zone.map ((i) => {
-                if (i.playerId != "" && i.timer == 0 ) {
-                    if (this.MainPlayer.playerId == i.playerId)
-                        i.createWave(1);
-                    else
-                        i.createWave(0);
-                        setTimeout(() => {  this.add(i.waves[i.waves.length-1]) }, 5000);
-                      
-                    
-                    i.startTimer();
-                }
-            });
+            if (this.gameStatus != 2) {
+                this.zone.map ((i,ind) => {
+                    if (i.playerId != "" && i.timer == 0 ) {
+                        if (this.MainPlayer.playerId == i.playerId)
+                            i.createWave(1);
+                        else
+                            i.createWave(0);
+                        setTimeout(() => {  
+                            if (ind == this.zone.length-1)
+                                this.add(i.waves[i.waves.length-1], 0);
+                            else
+                                this.add(i.waves[i.waves.length-1],1);
+                        }, 5000);
+                        i.startTimer();
+                    }
+                });
+            }
         }
 
        
@@ -358,7 +425,7 @@ export default class Application {
         this.renderer.render( this.scene , this.camera );
     }
 
-    add(mesh) {
+    add(mesh, clear = 0) {
         
      
         if (Array.isArray(mesh))
@@ -409,10 +476,9 @@ export default class Application {
                 this.scene.add(mesh.getMesh() );
                 this.objects.push(mesh);
             } else if (mesh instanceof Wave) {
-                if (this.mobs.length > 0) {
+                if (clear == 1 && this.mobs.length > 0) {
                     this.mobs.map ((i) => this.scene.remove(i.mesh));
                     this.mobs.map ((i) => {
-                        this.scene.remove(i.spline.line);
                         this.scene.remove(i.spline.spline);
                     });
                     this.mobs = [];
@@ -420,9 +486,11 @@ export default class Application {
                 mesh.wolfs.map ((i) => {
                     this.mobs.push(i);
                     this.scene.add(i.getMesh() );
-                    this.scene.add(i.spline.getLine());
                 });
-            } 
+            } else if (mesh instanceof Projectil) {
+                this.projectil.push(mesh);
+                this.scene.add(mesh.getMesh());
+            }
         
     }
 
@@ -433,14 +501,15 @@ export default class Application {
     
 
     onMouseClick(event){
-        if (this.flag == 0)
-            this.add(this.objs);
-        this.flag = 1;
-        this.controls.lock();
+        if (this.gameStatus != 2) {
+            if (this.flag == 0)
+                this.add(this.objs);
+            this.flag = 1;
+            this.controls.lock();
+        }
     }
 
     onKeyDown( event ){
-        
         if (event.keyCode == 84) { //T
             if (this.building == 1) {
                 for(var index in this.objects) 
@@ -533,40 +602,41 @@ export default class Application {
 
 
     updateZone(zoneData) {
-        let zoneIndex = this.zoneForId("");
+        let zoneIndex = zoneData.index;
         zoneData.turret.map ( (v, i) => {
-            if (typeof this.zone[zoneIndex] != "undefined")            
-            if (v != this.zone[zoneIndex].turret[i]) {
-                let zoneDataInner = this.zone[zoneIndex];
-                if (v == 0) { // free turret
-                    let dataTurret = zoneDataInner.turretClass[i];
-                    zoneDataInner.turretClass[i] = new TurretFree ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
-                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
-                    this.scene.remove(tmpobj);
-                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
-                    this.add(zoneDataInner.turretClass[i]);
-                    zoneDataInner.turret[this.selectedTower] = 0;
-                    zoneDataInner.turretUpgrades[this.selectedTower] = 0;
-                }
-                if (v == 1) { // fire turret
-                    let dataTurret = zoneDataInner.turretClass[i];
-                    zoneDataInner.turretClass[i] = new Turret1 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
-                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
-                    this.scene.remove(tmpobj);
-                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
-                    this.add(zoneDataInner.turretClass[i]);
-                    zoneDataInner.turret[this.selectedTower] = 1;
-                    zoneDataInner.turretUpgrades[this.selectedTower] = 1;
-                } 
-                if (v == 2) { // water turret
-                    let dataTurret = zoneDataInner.turretClass[i];
-                    zoneDataInner.turretClass[i] = new Turret2 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
-                    let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
-                    this.scene.remove(tmpobj);
-                    this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
-                    this.add(zoneDataInner.turretClass[i]);
-                    zoneDataInner.turret[this.selectedTower] = 2;
-                    zoneDataInner.turretUpgrades[this.selectedTower] = 2;
+            if (typeof this.zone[zoneIndex] != "undefined") { 
+                if (v != this.zone[zoneIndex].turret[i]) {
+                    let zoneDataInner = this.zone[zoneIndex];
+                    if (v == 0) { // free turret
+                        let dataTurret = zoneDataInner.turretClass[i];
+                        zoneDataInner.turretClass[i] = new TurretFree ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                        let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                        this.scene.remove(tmpobj);
+                        this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                        this.add(zoneDataInner.turretClass[i]);
+                        zoneDataInner.turret[this.selectedTower] = 0;
+                        zoneDataInner.turretUpgrades[this.selectedTower] = 0;
+                    }
+                    if (v == 1) { // fire turret
+                        let dataTurret = zoneDataInner.turretClass[i];
+                        zoneDataInner.turretClass[i] = new Turret1 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                        let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                        this.scene.remove(tmpobj);
+                        this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                        this.add(zoneDataInner.turretClass[i]);
+                        zoneDataInner.turret[this.selectedTower] = 1;
+                        zoneDataInner.turretUpgrades[this.selectedTower] = 1;
+                    } 
+                    if (v == 2) { // water turret
+                        let dataTurret = zoneDataInner.turretClass[i];
+                        zoneDataInner.turretClass[i] = new Turret2 ({x: dataTurret.x, y:dataTurret.y, z:dataTurret.z});
+                        let tmpobj = this.scene.getObjectByProperty("uuid",dataTurret.uuid );
+                        this.scene.remove(tmpobj);
+                        this.objects = this.objects.filter(item => item !== dataTurret) // remove o elemento
+                        this.add(zoneDataInner.turretClass[i]);
+                        zoneDataInner.turret[this.selectedTower] = 2;
+                        zoneDataInner.turretUpgrades[this.selectedTower] = 2;
+                    }
                 }
             }
         });
@@ -575,6 +645,7 @@ export default class Application {
             if (v > this.zone[zoneIndex].turretUpgrades[i]) 
                 this.zone[zoneIndex].turretClass[i].levelUp();
         });
+        if (typeof this.zone[zoneIndex] != "undefined") 
         this.zone[zoneIndex].updateZone(zoneData);
     }
 
@@ -613,20 +684,42 @@ export default class Application {
 
     setMainPlayer(player) {
         this.MainPlayer = player;
+        let bothReady = 0;
         this.zone.map((i) => {
+            if (typeof i.playerId != "undefined" ) 
+                bothReady++;
             if ((player.x < 0 && i.inv == 1) || (player.x > 0 && i.inv == -1))
             if (typeof i.playerId === "undefined" && this.zoneForId(player.playerId) == -1) {
                 i.associatePlayer(player.playerId);
-                i.startTimer();
+                bothReady++;
             }
+         });
+        if (bothReady == 2)
+        this.zone.map((i) => {
+            i.startTimer();
         } );
+    }
+
+    startGame(){
+        if (this.gameStatus == 0) {
+            let bothReady = 0;
+
+            this.zone.map((i) => {
+                if (typeof i.playerId != "undefined" ) 
+                    bothReady++;
+            });
+            if (bothReady == 2) {
+                this.gameStatus = 1;
+                this.zone.map((i) => {
+                    i.startTimer();
+                } );
+            }
+        }
     }
 
     playerForId (id){
         var index = -1;
         for (var i = 0; i < this.players.length; i++){
-            console.log("Player");
-            console.log(this.players[i].playerId + " --- " + id);
             if (this.players[i].playerId == id){
                 index = i;
                 break;

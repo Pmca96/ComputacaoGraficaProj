@@ -5,11 +5,7 @@ import  Application from './classStructure.js';
 import  Player from './classPlayer.js';
 
 var app;
-    socket.on('connect', function(){
-        app = new Application();
-        socket.emit('requestOldPlayers', {});
-        
-    });
+
 
     socket.on('updatePosition', function(data){
         var player = app.playerForId(data.playerId);
@@ -44,6 +40,11 @@ var app;
         app.associateZone(data);
     });
 
+    socket.on('connect', function(){
+        app = new Application();
+        socket.emit('requestOldPlayers', {});
+        
+    });
 
 
 

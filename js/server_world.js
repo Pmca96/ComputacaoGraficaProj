@@ -108,6 +108,15 @@ class Zone {
 
 }
 
+var removeZONE = function(player){
+    let zoneData = zoneForId(zone, player.playerId);
+    var index = zone.indexOf(zoneData);
+
+    if (index > -1) 
+        zone.splice(index, 1);
+    
+};
+
 var zoneForId = function(data, id){
     var zone = -1;
     for (var i = 0; i < data.length; i++)
@@ -125,4 +134,5 @@ module.exports.updatePlayerData = updatePlayerData;
 module.exports.playerForId = playerForId;
 module.exports.zone = zone;
 module.exports.Zone = Zone;
+module.exports.removeZONE = removeZONE;
 module.exports.zoneForId = zoneForId;

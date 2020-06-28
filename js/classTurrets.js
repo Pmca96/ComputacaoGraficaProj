@@ -1,4 +1,3 @@
-import {Fire}  from './libs/fire.js';
 import { DoubleSide } from './three/three.module.js';
 import { ParametricGeometries } from './three/geometries/ParametricGeometries.js';
 //Class para saber se os objetos são torre
@@ -110,7 +109,7 @@ class Turret1 extends Turret {
     constructor(position, ghost = 0) {
         super();
         this.lvl = 1;
-        this.attackDamadge = 10;
+        this.attackDamadge = 100;
         this.attackRange = 10;
         this.attackSpeed = 1;
         this.projectilSpeed = 2;
@@ -120,6 +119,7 @@ class Turret1 extends Turret {
         this.price=100;
         this.inv = 0.01;
         this.uuid="";
+        this.lastAttTime = new Date().getTime()/1000;
         if (ghost == 0)
             this.createTower(position);
     }
@@ -133,7 +133,6 @@ class Turret1 extends Turret {
         group.add(this.createRing(0, 1.3, 0));
         group.add(this.createRing(0, 2, 0));
         group.add(this.createSphere(0, 3.7, 0));
-        group.add(this.createFire(0,5, 0));
 
         group.position.set(position.x, position.y, position.z);
         group.receiveShadow = true;    
@@ -223,39 +222,12 @@ class Turret1 extends Turret {
         return dode;
     }
 
-    createFire(x,y,z) {
-        var plane = new THREE.PlaneBufferGeometry( 4, 4 );
-
-        let fire = new Fire( plane, {
-            textureWidth: 512,
-            textureHeight: 512,
-            debug: true
-        } );
-        fire.color1 = 0xffdcaa;
-        fire.color2 = 0xffa000;
-        fire.color3 = 0x000000;
-        fire.windX = 0.0;
-        fire.windY = 2.75;
-        fire.colorBias = 0.9;
-        fire.burnRate = 1.0;
-        fire.diffuse = 1.33;
-        fire.viscosity = 0.25;
-        fire.expansion = 0.0;
-        fire.swirl = 50.0;
-        fire.drag = 0.35;
-        fire.airSpeed = 10.0;
-        fire.speed = 500.0;
-        fire.massConservation = false;
-        fire.position.set(x,y,z);
-        return fire;
-    }
-
     levelUp() {
         if (this.lvl == 1)
          {
             this.lvl = 2;
-            this.attackDamadge = 20;
-            this.attackRange = 12;
+            this.attackDamadge = 200;
+            this.attackRange = 14;
             this.attackSpeed = 1.2;
             let texture = new THREE.TextureLoader().load("images/stone-granite.png");
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
@@ -270,8 +242,8 @@ class Turret1 extends Turret {
     getLevelUp() {
         let data = [];
         data.lvl = 2;
-        data.attackDamadge = 20;
-        data.attackRange = 12;
+        data.attackDamadge = 200;
+        data.attackRange = 14;
         data.attackSpeed = 1.2;
         data.projectilSpeed = 2;
         data.price = 100;
@@ -299,13 +271,24 @@ class Turret1 extends Turret {
         this.mesh.children[4].rotation.z += -0.05; 
         this.mesh.children[5].rotation.z += -0.05; 
     }
+
+ 
+    attackToPosition() { 
+        let currTime =new Date().getTime()/1000;
+        
+        if ((currTime-this.lastAttTime) > (1/this.attackSpeed)) {
+            this.lastAttTime = currTime;
+            return 1;
+        }
+        return 0;
+    }
 }
 
 class Turret2 extends Turret {
     constructor(position, ghost = 0) {
         super();
         this.lvl = 1;
-        this.attackDamadge = 5;
+        this.attackDamadge = 80;
         this.attackRange = 12;
         this.attackSpeed = 2;
         this.projectilSpeed = 3;       
@@ -315,8 +298,10 @@ class Turret2 extends Turret {
         this.price=125;
         this.inv = 0.01;
         this.uuid = "";
+        this.lastAttTime = new Date().getTime()/1000;
         if (ghost == 0)
             this.createTower(position);
+
     }
 
     createTower(position){
@@ -334,6 +319,7 @@ class Turret2 extends Turret {
         this.mesh = group;
         this.mesh.receiveShadow = true;
         this.uuid = this.mesh.uuid;
+
     }
 
     //Erva
@@ -435,17 +421,18 @@ class Turret2 extends Turret {
             this.mesh.children[1].material = new THREE.MeshStandardMaterial({map: texture});
             this.mesh.children[2].material = new THREE.MeshStandardMaterial({map: texture});
             this.mesh.updateMatrix();
-            this.attackDamadge = 10;
+            this.attackDamadge = 160;
             this.attackRange = 16;
             this.attackSpeed = 3;
             this.projectilSpeed = 3.5;
+            this.lvl = 2;
         }
     }
 
     getLevelUp() {
         let data = [];
         data.lvl = 2;
-        data.attackDamadge = 10;
+        data.attackDamadge = 160;
         data.attackRange = 16;
         data.attackSpeed = 3;
         data.projectilSpeed = 3.5;
@@ -459,10 +446,30 @@ class Turret2 extends Turret {
         return this.mesh;
     }
 
-    update(){
+    update(mobs){
+        let flag = 0;
+        if (mobs.length > 0) 
+            mobs.map((i) => {
+                let distance =  Math.sqrt(Math.pow(i.mesh.position.x-this.mesh.position.x,2) + 
+                // Math.pow(i.mesh.position.y-this.mesh.position.y,2) + 
+                Math.pow(i.mesh.position.z-this.mesh.position.z,2));
+
+                if (flag == 0 && distance <= this.attackRange) {
+                    flag=1;
+                    this.mesh.lookAt(i.mesh.position);
+                }
+            });
+    }
+
+    //gerar objeto do ataque
+    attackToPosition() { 
+        let currTime =new Date().getTime()/1000;
         
-        //this.mesh.children[5].rotation.x += -0.01; 
-        
+        if ((currTime-this.lastAttTime) > (1/this.attackSpeed)) {
+            this.lastAttTime = currTime;
+            return 2;
+        }
+        return 0;
     }
 }
 

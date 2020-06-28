@@ -16,7 +16,7 @@ export default class Zone {
         this.playerId;
         this.wave=0;
         this.waves = [];
-        this.timeBetweenWaves = 20;
+        this.timeBetweenWaves = 120;
         this.timer = 1;
         this.createZone(); 
     }
@@ -94,6 +94,7 @@ export default class Zone {
         this.wave = data.wave;
         this.turret = data.turret;
         this.turretUpgrades = data.turretUpgrades;
+        this.playerId = data.playerId;
     }
 
     createWave(isMainPlayerOfStructure) {
@@ -101,10 +102,14 @@ export default class Zone {
         if (this.waves.length > 10 ) { 
             createdWave = new Wave(Math.round(this.waves.length/10)); // levelUp
             for (let index = 0; index < (this.waves.length%10) + 5; index++) {
-                let randomX = 0;
-                let randomZ = 0;
-                let position = {x:-7, y:0.7, z:80};
-                createdWave.addWolf(position, this.inv, (index+1) * 3);
+                let randomX = Math.floor(Math.random() * 14) - 7;
+                let randomZ = Math.floor(Math.random() * 40) - 20 ;
+                if (randomZ <= 0 )
+                    randomZ += 95;
+                else 
+                    randomZ -= 95;
+                let position = {x:randomX, y:-0.7, z:randomZ};
+                createdWave.addWolf(position, this.inv, (index+1) * 2);
             }
         } else { 
             createdWave = new Wave(1);
@@ -118,7 +123,7 @@ export default class Zone {
                     randomZ -= 95;
                 let position = {x:randomX, y:-0.7, z:randomZ};
                     
-                createdWave.addWolf(position, this.inv, index + 2);
+                createdWave.addWolf(position, this.inv, (index+1) * 2);
             }
         }
         this.waves.push(createdWave);

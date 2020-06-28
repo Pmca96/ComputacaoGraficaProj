@@ -32,7 +32,9 @@ io.on('connection', function(socket){
             }
         }
 
-        world.zone.map((i) => socket.broadcast.emit('updateZone', i));
+        world.zone.map((i) => {
+            socket.emit('updateZone', i);
+        });
     });
 
     socket.on('updatePosition', function(data){
@@ -43,9 +45,12 @@ io.on('connection', function(socket){
         socket.broadcast.emit('updatePosition', newData);
     });
 
+
+
     socket.on('disconnect', function(){
         io.emit('removeOtherPlayer', player);
         world.removePlayer( player );
+        world.removeZONE(player);
     });
 
     //ZONE
@@ -61,20 +66,19 @@ io.on('connection', function(socket){
         let zoneFinder = world.zoneForId(world.zone, data.playerId);
         if (zoneFinder != -1) {
             zoneFinder.updateZoneData(data);
+            data.index = world.zone.indexOf(zoneFinder);
             socket.broadcast.emit('updateZone', data);
         }
         
     });
-
-    socket.on('removeZone', function(data){
-        let zoneFinder = world.zoneForId(world.zone, data.playerId);
-        const index = zone.indexOf(zoneFinder);
-        if (index > -1) 
-            world.zone.splice(index, 1);
-        socket.broadcast.emit('removeZone', data);
+    socket.on('requestUpdateZone', function(){
+        world.zone.map((i, ind) => {
+            i.index = ind;
+            socket.emit('updateZone', i);
+        });
+        
+        
     });
-
-    
 
 });
 

@@ -126,7 +126,28 @@
             font-family:monospace;
         }
     </style>
-</head>
+
+<!-- ------ Custom Shader Code for atmospheric glow ------ -->
+<script id="vertexShaderAtmosphere" type="x-shader/x-vertex">
+    varying vec3 vNormal;
+    void main() 
+    {
+        vNormal = normalize( normalMatrix * normal );
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+</script>
+    
+ <!-- fragment shader a.k.a. pixel shader -->
+<script id="fragmentShaderAtmosphere" type="x-shader/x-vertex"> 
+    uniform float c;
+    uniform float p;
+    varying vec3 vNormal;
+    void main() 
+    {
+        float intensity = pow( c - dot( vNormal, vec3( 0.0, 0.0, 1.0 ) ), p ); 
+        gl_FragColor = vec4( 1.0, 1.0, 1.0, 1.0 ) * intensity;
+    }
+</script>
 
 
 <body >
@@ -184,7 +205,7 @@
                     <div style="width:100%; font-size:20px" id="dmdg1">10</div>
                     <div style="width:100%; font-size:20px" id="range1">10</div>
                     <div style="width:100%; font-size:20px" id="speed1">10</div>
-                    <div style="width:100%; font-size:20px" id="proj1">10</div>
+                    <div style="width:100%; font-size:20px" id="proj1">X</div>
                 </div>
             </div>
             <div class="towerSection" id="tower2" >
@@ -199,7 +220,7 @@
                     <div style="width:100%; font-size:20px" id="dmdg2">10</div>
                     <div style="width:100%; font-size:20px" id="range2">10</div>
                     <div style="width:100%; font-size:20px" id="speed2">10</div>
-                    <div style="width:100%; font-size:20px" id="proj2">10</div>
+                    <div style="width:100%; font-size:20px" id="proj2">X</div>
                 </div>
             </div>
 
@@ -215,7 +236,7 @@
                     <div style="width:100%; font-size:20px" id="dmdg3">10</div>
                     <div style="width:100%; font-size:20px" id="range3">10</div>
                     <div style="width:100%; font-size:20px" id="speed3">10</div>
-                    <div style="width:100%; font-size:20px" id="proj3">10</div>
+                    <div style="width:100%; font-size:20px" id="proj3">X</div>
                 </div>
             </div>
 

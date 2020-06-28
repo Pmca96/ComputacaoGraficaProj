@@ -12,6 +12,7 @@ class Mobs extends THREE.Object3D {
         if (this.position.y < 0)
             this.signalVector = -1
         this.up = new THREE.Vector3( 0, 0, 1 );
+        
     }
 
     moveOnSpline(currentTime) {
@@ -32,8 +33,7 @@ class Mobs extends THREE.Object3D {
         
             // set the quaternion
             this.mesh.quaternion.setFromAxisAngle( axis, this.radians);
-            this.t += 0.00025;
-            this.t += 0.00225;
+            this.t += 0.00035;
             return this.t;
         }
         return 0;
@@ -51,7 +51,7 @@ class Wolf extends Mobs {
         this.createWolf(position.x, position.y, position.z, inv);
     }
 
-    createWolf(x, y, z, inv){
+    createWolf(x, y, z){
         let path = "models/wolf/Wolf-Blender-2.82a.gltf";
         let material = "";
 
@@ -72,7 +72,23 @@ class Wolf extends Mobs {
     getMesh() {
         return this.mesh;
     }
-    update(){
+    update(projecteis){
+        let response = {status:0, indexes: []};
+        let pos = this.mesh.position;
+        projecteis.map((i, ind) => {
+            let distance = Math.sqrt(Math.pow(pos.x-i.mesh.position.x,2) + Math.pow(pos.z-i.mesh.position.z,2));
+            if (distance < 2.5 ) {
+                if (this.life > 0) {
+                    this.life -= i.attackDamadge;
+                    if (this.life <= 0)
+                        response.status = 2;
+                    else
+                        response.status = 1;
+                    response.indexes.push(ind);
+                } 
+            }
+        });
+        return response;
     }
 }
 
@@ -87,7 +103,6 @@ class Spline {
             new THREE.Vector3(-2*inv, position.y, 0),
            // new THREE.Vector3(-10*inv, position.y+1, 0),
             new THREE.Vector3(-20*inv, position.y, 0),
-            
             new THREE.Vector3(-20*inv, position.y, 20*inv),
             //new THREE.Vector3(-20*inv, position.y+1, 40*inv),
             new THREE.Vector3(-21*inv, position.y, 41*inv),
@@ -114,20 +129,7 @@ class Spline {
             new THREE.Vector3(-47*inv, position.y, -13*inv),
             new THREE.Vector3(-47*inv, position.y, -1*inv),
             new THREE.Vector3(-55*inv, position.y, -0.3*inv),
-        ], false, "centripetal", 0);
-        var material = new THREE.LineBasicMaterial({
-            color: 0xff00f0,
-        });
-        var geometry = new THREE.Geometry();
-        for(var i = 0; i < this.spline.getPoints(200).length; i++){
-            geometry.vertices.push(this.spline.getPoints(200)[i]);  
-        }
-        this.line = new THREE.Line(geometry, material);
-        
-    }
-
-    getLine() {
-        return this.line;
+        ], false, "centripetal", 0);  
     }
 }
 

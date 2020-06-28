@@ -18,7 +18,7 @@ export default class Player extends THREE.Object3D {
         this.keyState = {};
         this.clip = [];
         this.lookingAtZ = 0;
-        this.lives = 20;
+        this.lives = 5;
         this.money = 200;
     }
 
